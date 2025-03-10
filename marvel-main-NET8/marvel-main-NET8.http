@@ -1,0 +1,6 @@
+@marvel_main_NET8_HostAddress = http://localhost:5247
+
+GET {{marvel_main_NET8_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
