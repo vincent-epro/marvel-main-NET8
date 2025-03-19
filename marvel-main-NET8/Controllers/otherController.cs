@@ -20,6 +20,7 @@ public class otherController : ControllerBase
         _scrme = context;
     }
 
+    // Check Agent API
     [Route("CheckAgentId")]
     [HttpPost]
     public IActionResult CheckAgentId([FromBody] JsonObject data)
@@ -54,4 +55,6 @@ public class otherController : ControllerBase
 
         return exists;
     }
+
+
 }
