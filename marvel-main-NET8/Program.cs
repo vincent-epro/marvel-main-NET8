@@ -13,9 +13,6 @@ namespace marvel_main_NET8
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-      //      builder.Services.AddEndpointsApiExplorer();
-      //      builder.Services.AddSwaggerGen();
 
 
             // Add DbContext
@@ -28,8 +25,8 @@ namespace marvel_main_NET8
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-           //     app.UseSwagger();
-           //     app.UseSwaggerUI();
+                //   UseSwagger
+
             }
 
             app.UseAuthorization();

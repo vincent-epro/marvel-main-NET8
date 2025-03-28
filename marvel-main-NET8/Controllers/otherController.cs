@@ -25,7 +25,6 @@ public class otherController : ControllerBase
     [HttpPost]
     public IActionResult CheckAgentId([FromBody] JsonObject data)
     {
-       // string tk_agentId = (data.Agent_Id == null) ? string.Empty : Convert.ToString(data.Agent_Id.Value);
 
         try
         {
@@ -40,7 +39,7 @@ public class otherController : ControllerBase
 
     private bool userExists(JsonObject data)
     {
-        // int agentId = data.TryGetProperty("AgentID", out JsonElement element) && element.ValueKind == JsonValueKind.Number ? element.GetInt32() : -1;
+
         int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
         bool exists = true;
 
