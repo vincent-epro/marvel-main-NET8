@@ -11,11 +11,11 @@ using System.Reflection;
 //[Route("api/[controller]")]
 [Route("api")]
 [ApiController]
-public class otherController : ControllerBase
+public class OtherController : ControllerBase
 {
     private readonly ScrmDbContext _scrme;
 
-    public otherController(ScrmDbContext context)
+    public OtherController(ScrmDbContext context)
     {
         _scrme = context;
     }
