@@ -15,26 +15,22 @@ public partial class ScrmDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Agentinfo> Agentinfos { get; set; }
-
+    public virtual DbSet<agentinfo> agentinfos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Agentinfo>(entity =>
+        modelBuilder.Entity<agentinfo>(entity =>
         {
-            entity.HasKey(e => new { e.AgentId, e.SellerId }).HasName("PK_agentInfo");
+            entity.HasKey(e => new { e.AgentID, e.SellerID }).HasName("PK_agentInfo");
 
             entity.ToTable("agentinfo");
 
-            entity.Property(e => e.AgentId).HasColumnName("AgentID");
-            entity.Property(e => e.SellerId)
+            entity.Property(e => e.SellerID)
                 .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("SellerID");
-            entity.Property(e => e.AccountStatus)
+                .IsUnicode(false);
+            entity.Property(e => e.Account_status)
                 .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("Account_status");
+                .IsUnicode(false);
             entity.Property(e => e.AgentName).HasMaxLength(100);
             entity.Property(e => e.ColId).ValueGeneratedOnAdd();
             entity.Property(e => e.Counter).HasDefaultValue(0);
@@ -43,14 +39,12 @@ public partial class ScrmDbContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.ExpiryDate).HasColumnType("datetime");
             entity.Property(e => e.LastLoginDate).HasColumnType("datetime");
-            entity.Property(e => e.LevelId).HasColumnName("LevelID");
             entity.Property(e => e.Password)
                 .HasMaxLength(500)
                 .IsUnicode(false);
-            entity.Property(e => e.PhotoType)
+            entity.Property(e => e.Photo_Type)
                 .HasMaxLength(50)
-                .IsUnicode(false)
-                .HasColumnName("Photo_Type");
+                .IsUnicode(false);
         });
 
         OnModelCreatingPartial(modelBuilder);

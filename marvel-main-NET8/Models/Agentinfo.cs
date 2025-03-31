@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace marvel_main_NET8.Models;
 
-public partial class Agentinfo
+public partial class agentinfo
 {
     public int ColId { get; set; }
 
-    public int AgentId { get; set; }
+    public int AgentID { get; set; }
 
     public string? AgentName { get; set; }
 
     public string? Password { get; set; }
 
-    public int? LevelId { get; set; }
+    public int? LevelID { get; set; }
 
-    public string SellerId { get; set; } = null!;
+    public string SellerID { get; set; } = null!;
 
     public int? Counter { get; set; }
 
@@ -23,11 +23,11 @@ public partial class Agentinfo
 
     public DateTime? LastLoginDate { get; set; }
 
-    public string? AccountStatus { get; set; }
+    public string? Account_status { get; set; }
 
     public byte[]? Photo { get; set; }
 
-    public string? PhotoType { get; set; }
+    public string? Photo_Type { get; set; }
 
     public string? Email { get; set; }
 }
