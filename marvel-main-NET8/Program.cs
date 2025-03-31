@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace marvel_main_NET8
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {

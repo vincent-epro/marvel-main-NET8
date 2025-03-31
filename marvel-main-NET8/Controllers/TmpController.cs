@@ -14,11 +14,11 @@ namespace marvel_main_NET8.Controllers
     //[Route("api/[controller]")]
     [Route("api")]
     [ApiController]
-    public class OtherController : ControllerBase
+    public class TmpController : ControllerBase
     {
         private readonly ScrmDbContext _scrme;
 
-        public OtherController(ScrmDbContext context)
+        public TmpController(ScrmDbContext context)
         {
             _scrme = context;
         }
