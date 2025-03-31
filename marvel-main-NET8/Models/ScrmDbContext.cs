@@ -17,6 +17,9 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<agentinfo> agentinfos { get; set; }
 
+    public virtual DbSet<user_role> user_roles { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<agentinfo>(entity =>
@@ -45,6 +48,19 @@ public partial class ScrmDbContext : DbContext
             entity.Property(e => e.Photo_Type)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<user_role>(entity =>
+        {
+            entity.HasKey(e => e.RoleID);
+
+            entity.ToTable("user_role");
+
+            entity.Property(e => e.Categories).HasMaxLength(1000);
+            entity.Property(e => e.Companies).HasMaxLength(1000);
+            entity.Property(e => e.Functions).HasMaxLength(1000);
+            entity.Property(e => e.RoleName).HasMaxLength(50);
+            entity.Property(e => e.RoleStatus).HasMaxLength(1);
         });
 
         OnModelCreatingPartial(modelBuilder);
