@@ -55,6 +55,7 @@ public class OtherController : ControllerBase
         return exists;
     }
 
+
     // Check Seller Id
     [Route("CheckSellerId")]
     [HttpPost]

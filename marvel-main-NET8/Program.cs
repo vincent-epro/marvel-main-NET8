@@ -14,10 +14,17 @@ namespace marvel_main_NET8
 
             builder.Services.AddControllers();
 
+            // Add DbContext using environment variable
+            var connectionString_SCRM = Environment.GetEnvironmentVariable("ConnectionString_SCRM");
+            if (string.IsNullOrEmpty(connectionString_SCRM))
+            {
+                throw new InvalidOperationException("The 'ConnectionString_XXXXXX' environment variable is not set.");
+            }
+
 
             // Add DbContext
             builder.Services.AddDbContext<ScrmDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(connectionString_SCRM));
 
 
             var app = builder.Build();
