@@ -124,7 +124,7 @@ namespace marvel_main_NET8.Controllers
         {
             List<JObject> roleListJason = new List<JObject>(); // declare overall json list
 
-            JObject rolesJson = new JObject(); // declare json object
+           // JObject rolesJson = new JObject(); // declare json object
 
             IQueryable<user_role> _linq_user_roles = from _r in _scrme.user_roles
                                                      select _r; // declare user role data
@@ -149,7 +149,7 @@ namespace marvel_main_NET8.Controllers
                 roleListJason.Add(tempJson);
             }
 
-            rolesJson = new JObject() // add to overall json object
+            JObject rolesJson = new JObject() // add to overall json object
                     {
                         new JProperty("result", "success"),
                         new JProperty("details", roleListJason)
