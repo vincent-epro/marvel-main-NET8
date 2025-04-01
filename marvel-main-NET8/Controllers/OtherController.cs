@@ -61,14 +61,9 @@ namespace marvel_main_NET8.Controllers
             ClaimsPrincipal? _claims_principal = GetClaimsPrincipal(P_Token);
             if (_claims_principal == null) return null;
 
-            try
-            {
-                _claims_identity = (ClaimsIdentity?)_claims_principal.Identity;
-            }
-            catch (NullReferenceException)
-            {
-                return null;
-            }
+
+            _claims_identity = (ClaimsIdentity?)_claims_principal.Identity;
+
 
             Claim? _claim_name = _claims_identity?.FindFirst(ClaimTypes.Name);
             return _claim_name?.Value; // username
