@@ -30,9 +30,8 @@ namespace marvel_main_NET8.Controllers
         }
 
 
-
         // JWT
-        private static string Secret = "moKvdQJpSZOUmSuiitf4NfLTzoyaF0xdalc3tnDJQVokN9m+3eDVmWkdpwRL1Ogpb2+roauXzmpckJS/O4POrw==";
+        private static readonly string Secret = Environment.GetEnvironmentVariable("JWT_Secret") ?? "";
 
         public static string GenerateToken(string P_Username)
         {
