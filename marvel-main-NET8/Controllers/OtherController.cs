@@ -98,10 +98,8 @@ namespace marvel_main_NET8.Controllers
             }
         }
 
-        private static bool Authenticated(string token, string P_Username)
+        public static bool Authenticated(string token, string P_Username)
         {
-
-
             if (string.IsNullOrEmpty(token) ||
                 string.IsNullOrEmpty(P_Username))
             {
@@ -111,7 +109,6 @@ namespace marvel_main_NET8.Controllers
             return ValidateToken(token) == P_Username;
 
         }
-
 
 
 
