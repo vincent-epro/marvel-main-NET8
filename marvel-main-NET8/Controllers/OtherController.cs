@@ -9,6 +9,7 @@ using System.Text.Json.Nodes;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace marvel_main_NET8.Controllers
 {
@@ -106,12 +107,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                var jsonString = JsonConvert.SerializeObject(GetRoleinfo(status), Newtonsoft.Json.Formatting.None);
-                return new ContentResult
-                {
-                    Content = jsonString,
-                    ContentType = "application/json"
-                };
+                return Content(GetRoleinfo(status).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
 
             }
             catch (Exception err)
@@ -205,6 +201,96 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Retrieve login details
+        [Route("GetLogin")]
+        [HttpPost]
+        public IActionResult GetLogin([FromBody] JsonObject data)
+        {
+
+            try
+            {
+                return Content(GetLoginInfo().ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+
+            }
+        }
+
+
+        private JObject GetLoginInfo()
+        {
+            // obtain linq results by left joining 2 tables: agentinto and user_role
+            var _agent_users = from _agent in _scrme.agentinfos
+                               join _role in _scrme.user_roles
+                                    on _agent.LevelID equals _role.RoleID
+                                    into joined
+                               from _roles in joined.DefaultIfEmpty()
+                               orderby _agent.SellerID
+                               //where _agent.Account_status == "Active"
+                               select new
+                               {
+                                   _agent,
+                                   _roles.RoleName
+                               };
+
+            // declare a list of json objects containing the each row of data
+            List<JObject> _agent_list = new List<JObject>();
+
+
+            // JObject allJsonResults = new JObject(); // declare a json object to contain all rows of data
+
+            // iterate through each row of data in agentInfo
+            foreach (var _agent_item in _agent_users)
+            {
+                // declare a temp json object to store each column of data
+                JObject tempJson = new JObject();
+
+                tempJson.RemoveAll(); // clear the temp object
+
+                // iterate through each column of the _agent_item
+                foreach (PropertyInfo property in _agent_item._agent.GetType().GetProperties())
+                {
+                    // add all column names and values to temp, except "Password"
+                    switch (property.Name)
+                    {
+
+                        case "Password":
+                            {
+                                break;
+                            }
+
+                        default:
+                            //add the column name and value to temp
+                            tempJson.Add(new JProperty(property.Name, property.GetValue(_agent_item._agent)));
+                            break;
+                    }
+                }
+
+                tempJson.Add(new JProperty("RoleName", _agent_item.RoleName));
+
+                _agent_list.Add(tempJson);
+            }
+
+
+
+            // set up _all_results json data
+            JObject allJsonResults = new JObject()
+            {
+                new JProperty("result", "success"),
+                new JProperty("details", _agent_list)
+            };
+
+            // return all results in json format
+            return allJsonResults;
+        }
+
+
+
+
+
     }
 
-}
+    }
