@@ -68,7 +68,7 @@ namespace marvel_main_NET8.Controllers
             catch (NullReferenceException)
             {
                 return null;
-            };
+            }
 
             Claim? _claim_name = _claims_identity?.FindFirst(ClaimTypes.Name);
             return _claim_name?.Value; // username
@@ -101,7 +101,7 @@ namespace marvel_main_NET8.Controllers
             catch (Exception e)
             {
                 return null;
-            };
+            }
         }
 
         private static bool Authenticated(string token, string P_Username)
