@@ -10,6 +10,9 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace marvel_main_NET8.Controllers
 {
@@ -26,16 +29,120 @@ namespace marvel_main_NET8.Controllers
             _scrme = context;
         }
 
+
+
+        // JWT
+        private static string Secret = "moKvdQJpSZOUmSuiitf4NfLTzoyaF0xdalc3tnDJQVokN9m+3eDVmWkdpwRL1Ogpb2+roauXzmpckJS/O4POrw==";
+
+        public static string GenerateToken(string P_Username)
+        {
+            byte[] _non_base64_secret = Convert.FromBase64String(Secret);
+            SymmetricSecurityKey _symmetric_security_key = new SymmetricSecurityKey(_non_base64_secret);
+
+            ClaimsIdentity _claims_identity = new ClaimsIdentity();
+            _claims_identity.AddClaim(new Claim(ClaimTypes.Name, P_Username));
+
+            SecurityTokenDescriptor _security_token_descriptor = new SecurityTokenDescriptor
+            {
+                Subject = _claims_identity,
+                Expires = DateTime.UtcNow.AddMinutes(60 * 24),
+                SigningCredentials = new SigningCredentials(_symmetric_security_key, SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            JwtSecurityTokenHandler _jwt_security_token_handler = new JwtSecurityTokenHandler();
+            JwtSecurityToken _jwt_security_token = _jwt_security_token_handler.CreateJwtSecurityToken(_security_token_descriptor);
+            return _jwt_security_token_handler.WriteToken(_jwt_security_token);
+        }
+
+        public static string? ValidateToken(string P_Token)
+        {
+            ClaimsIdentity? _claims_identity;
+
+            ClaimsPrincipal? _claims_principal = GetClaimsPrincipal(P_Token);
+            if (_claims_principal == null) return null;
+
+            try
+            {
+                _claims_identity = (ClaimsIdentity?)_claims_principal.Identity;
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            };
+
+            Claim? _claim_name = _claims_identity?.FindFirst(ClaimTypes.Name);
+            return _claim_name?.Value; // username
+        }
+
+        public static ClaimsPrincipal? GetClaimsPrincipal(string P_Token)
+        {
+            try
+            {
+                JwtSecurityTokenHandler _jwt_security_token_handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken _jwt_security_token = (JwtSecurityToken)_jwt_security_token_handler.ReadToken(P_Token);
+
+                if (_jwt_security_token == null) return null;
+
+                byte[] _non_base64_secret = Convert.FromBase64String(Secret);
+
+                TokenValidationParameters _token_validation_parameters = new TokenValidationParameters()
+                {
+                    RequireExpirationTime = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(_non_base64_secret)
+                };
+
+                SecurityToken _security_token;
+                ClaimsPrincipal _claims_principal = _jwt_security_token_handler.ValidateToken(P_Token, _token_validation_parameters, out _security_token);
+
+                return _claims_principal;
+            }
+            catch (Exception e)
+            {
+                return null;
+            };
+        }
+
+        private static bool Authenticated(string token, string P_Username)
+        {
+
+
+            if (string.IsNullOrEmpty(token) ||
+                string.IsNullOrEmpty(P_Username))
+            {
+                return false;
+            }
+
+            return ValidateToken(token) == P_Username;
+
+        }
+
+
+
+
+
+
         // Check Agent Id
         [Route("CheckAgentId")]
         [HttpPost]
         public IActionResult CheckAgentId([FromBody] JsonObject data)
         {
+            string token = (data["Token"] ?? "").ToString();
+            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
 
             try
             {
-                bool isExists = UserExists(data);
-                return Ok(new { result = isExists });
+                if (Authenticated(token, tk_agentId))
+                {
+                    bool isExists = UserExists(data);
+                    return Ok(new { result = isExists });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = "Not Auth." });
+                }
+
             }
             catch (Exception err)
             {
@@ -67,11 +174,20 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CheckSellerId([FromBody] JsonObject data)
         {
+            string token = (data["Token"] ?? "").ToString();
+            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
 
             try
             {
-                bool isExists = SellerIdExists(data);
-                return Ok(new { result = isExists });
+                if (Authenticated(token, tk_agentId))
+                {
+                    bool isExists = SellerIdExists(data);
+                    return Ok(new { result = isExists });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = "Not Auth." });
+                }
             }
             catch (Exception err)
             {
@@ -104,10 +220,19 @@ namespace marvel_main_NET8.Controllers
         public IActionResult GetRoles([FromBody] JsonObject data)
         {
             string status = (data["RoleStatus"] ?? "").ToString();
+            string token = (data["Token"] ?? "").ToString();
+            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
 
             try
             {
-                return Content(GetRoleinfo(status).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                if (Authenticated(token, tk_agentId))
+                {
+                    return Content(GetRoleinfo(status).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = "Not Auth." });
+                }
 
             }
             catch (Exception err)
@@ -161,13 +286,20 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetAgentsOfRole([FromBody] JsonObject data)
         {
+            string token = (data["Token"] ?? "").ToString();
+            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
 
             try
             {
-
+                if (Authenticated(token, tk_agentId))
+                {
                     string agentsOfRole = GetAgentlistByRole(data);
                     return Ok(new { result = "success", details = agentsOfRole });
-
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = "Not Auth." });
+                }
             }
             catch (Exception err)
             {               
@@ -206,10 +338,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetLogin([FromBody] JsonObject data)
         {
+            string token = (data["Token"] ?? "").ToString();
+            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
 
             try
             {
-                return Content(GetLoginInfo().ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                if (Authenticated(token, tk_agentId))
+                {
+                    return Content(GetLoginInfo().ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = "Not Auth." });
+                }
 
             }
             catch (Exception err)
