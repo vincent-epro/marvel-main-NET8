@@ -97,6 +97,7 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Retrieve user roles
         [Route("GetRoles")]
         [HttpPost]
         public IActionResult GetRoles([FromBody] JsonObject data)
@@ -140,7 +141,7 @@ namespace marvel_main_NET8.Controllers
                 JObject tempJson = new JObject();
                 tempJson.RemoveAll(); // clear the temp object
 
-                // iterate through each column of the _agent_item
+                // iterate through each column 
                 foreach (PropertyInfo property in _role_item.GetType().GetProperties())
                 {
                     tempJson.Add(new JProperty(property.Name, property.GetValue(_role_item)));
@@ -159,7 +160,49 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Retrieve agent list of a role
+        [Route("GetAgentsOfRole")]
+        [HttpPost]
+        public IActionResult GetAgentsOfRole([FromBody] JsonObject data)
+        {
 
+            try
+            {
+
+                    string agentsOfRole = GetAgentlistByRole(data);
+                    return Ok(new { result = "success", details = agentsOfRole });
+
+            }
+            catch (Exception err)
+            {               
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private string GetAgentlistByRole(JsonObject data)
+        {
+            int levelId = Convert.ToInt32((data["LevelID"] ?? "-1").ToString());
+
+            // obtain user records based on the level id
+            IQueryable<agentinfo> _agents = (from _a in _scrme.agentinfos
+                                                        where _a.LevelID == levelId
+                                                        select _a);
+
+            string agentsOfRole = string.Empty;
+
+            if (_agents.Count() > 0)
+            {
+                agentsOfRole = "The role is used by: ";
+                // iterate through each row of data in agentInfo
+                foreach (agentinfo _agent_item in _agents)
+                {
+                    // append agent to the string
+                    agentsOfRole = agentsOfRole + _agent_item.AgentName + "(ID: " + _agent_item.AgentID + ")\n";
+                }
+            }
+
+            return agentsOfRole;
+        }
 
 
     }
