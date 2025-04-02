@@ -17,6 +17,8 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<agentinfo> agentinfos { get; set; }
 
+    public virtual DbSet<config> configs { get; set; }
+
     public virtual DbSet<user_role> user_roles { get; set; }
 
 
@@ -48,6 +50,18 @@ public partial class ScrmDbContext : DbContext
             entity.Property(e => e.Photo_Type)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<config>(entity =>
+        {
+            entity.HasKey(e => e.P_Id);
+
+            entity.ToTable("config");
+
+            entity.Property(e => e.P_Name)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.P_Value).HasMaxLength(100);
         });
 
         modelBuilder.Entity<user_role>(entity =>
