@@ -19,9 +19,17 @@ namespace marvel_main_NET8.Controllers
 
     public class ConfigDetails
     {
-        public int P_Id;
-        public string? P_Name;
-        public string? P_Value;
+        // Public properties for external access
+        public int P_Id { get; private set; }
+        public string? P_Name { get; private set; }
+        public string? P_Value { get; private set; }
+
+        public ConfigDetails(int id, string? name, string? value)
+        {
+            P_Id = id;
+            P_Name = name;
+            P_Value = value;
+        }
     }
 
     //[Route("api/[controller]")]
@@ -246,12 +254,16 @@ namespace marvel_main_NET8.Controllers
                         foreach (config _config_item in _config_details)
                         {
                             // declare ConfigDetails class object
-                            ConfigDetails _cd = new ConfigDetails();
+                            // ConfigDetails _cd = new ConfigDetails(); // old
 
                             // assign the id, name and details to the ConfigDetails object
-                            _cd.P_Id = _config_item.P_Id;
-                            _cd.P_Name = _config_item.P_Name;
-                            _cd.P_Value = _config_item.P_Value;
+                            //  _cd.P_Id = _config_item.P_Id; // old
+                            //  _cd.P_Name = _config_item.P_Name; // old
+                            //  _cd.P_Value = _config_item.P_Value; // old
+
+                            // create ConfigDetails object using the constructor
+                            ConfigDetails _cd = new ConfigDetails(_config_item.P_Id, _config_item.P_Name, _config_item.P_Value);
+
 
                             // apend the object to the list
                             _list_config_details.Add(_cd);
@@ -261,7 +273,7 @@ namespace marvel_main_NET8.Controllers
                     }
                     else
                     {
-                        _list_config_details = null;
+                     //   _list_config_details = null; //old
                     }
 
                     JArray configJson = (JArray)JToken.FromObject(_list_config_details);
