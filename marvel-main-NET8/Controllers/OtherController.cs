@@ -155,6 +155,7 @@ namespace marvel_main_NET8.Controllers
             agentinfo? _agent = null;
             agentinfo? _agent_temp = null;
 
+            int existing_agentid = 0;
 
             // use seller id to log in
             if (sellerId != string.Empty)
@@ -182,6 +183,99 @@ namespace marvel_main_NET8.Controllers
 
                     // update status and save changes in db
                     _scrme.SaveChanges();
+
+                    // declare a temp json object to store each agent item
+                    JObject agentObj = new JObject();
+                    agentObj.RemoveAll(); // clear the object
+
+                    // iterate each column of the _agent_item
+                    foreach (PropertyInfo property in _agent.GetType().GetProperties())
+                    {
+                        // add all column names and values to temp, except "Password"
+                        switch (property.Name)
+                        {
+                            case "Password":
+                            case "Photo":
+                            case "Photo_Type":
+                                {
+                                    break;
+                                }
+                            default:
+                                // add the column name and value to temp
+                                agentObj.Add(new JProperty(property.Name, property.GetValue(_agent)));
+                                break;
+                        }
+                    }
+
+                    int? roleId = _agent.LevelID; // obtain the role id from agent_info
+
+                    // use the role id to find the corresponding role name and companies
+                    var _role = (from _r in _scrme.user_roles
+                                 where _r.RoleID == roleId
+                                 select new
+                                 {
+                                     _r.RoleName,
+                                     _r.Companies,
+                                     _r.Categories,
+                                     _r.Functions
+                                 }).SingleOrDefault();
+
+                    if (_role != null)
+                    {
+                        // add role name and companies to _agentObj
+                        agentObj.Add(new JProperty("RoleName", _role.RoleName));
+                        agentObj.Add(new JProperty("Companies", _role.Companies));
+                        agentObj.Add(new JProperty("Categories", _role.Categories));
+                        agentObj.Add(new JProperty("Functions", _role.Functions));
+                    }
+
+                    agentObj.Add(new JProperty("Token", GenerateToken(Convert.ToString(_agent.AgentID))));
+
+
+                    // obtain all data from table config
+                    IQueryable<config> _config_details = (from _conf in _scrme.configs
+                                                          select _conf);
+
+                    // declare new FieldDetails class object as List
+                    List<ConfigDetails> _list_config_details = new List<ConfigDetails>();
+
+                    // for existing config
+                    if (_config_details.Count() > 0)
+                    {
+                        // iterate through the rows from that field category
+                        foreach (config _config_item in _config_details)
+                        {
+                            // declare ConfigDetails class object
+                            ConfigDetails _cd = new ConfigDetails();
+
+                            // assign the id, name and details to the ConfigDetails object
+                            _cd.P_Id = _config_item.P_Id;
+                            _cd.P_Name = _config_item.P_Name;
+                            _cd.P_Value = _config_item.P_Value;
+
+                            // apend the object to the list
+                            _list_config_details.Add(_cd);
+                        }
+
+                        // for non-existing field category
+                    }
+                    else
+                    {
+                        _list_config_details = null;
+                    }
+
+                    JArray configJson = (JArray)JToken.FromObject(_list_config_details);
+
+                    // add config to _agentObj
+                    agentObj.Add(new JProperty("config", configJson));
+
+
+                    allJsonResults = new JObject()
+                    {
+                        new JProperty("result", "success"),
+                        new JProperty("details", agentObj)
+                    };
+
                 }
                 else
                 {
@@ -206,6 +300,7 @@ namespace marvel_main_NET8.Controllers
                     //      _agent.Counter = 0; // reset counter
 
                     canLogin = false;
+                    existing_agentid = _agent.AgentID;
                 }
             }
             else
@@ -241,8 +336,8 @@ namespace marvel_main_NET8.Controllers
                     {
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
-                        new JProperty("AgentID", _agent.AgentID),
-                        new JProperty("Token", GenerateToken(Convert.ToString(_agent.AgentID)))
+                        new JProperty("AgentID", existing_agentid),
+                        new JProperty("Token", GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else if (details == "Account has expired.")
@@ -251,8 +346,8 @@ namespace marvel_main_NET8.Controllers
                     {
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
-                        new JProperty("AgentID", _agent.AgentID),
-                        new JProperty("Token", GenerateToken(Convert.ToString(_agent.AgentID)))
+                        new JProperty("AgentID", existing_agentid),
+                        new JProperty("Token", GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else
@@ -267,100 +362,8 @@ namespace marvel_main_NET8.Controllers
                     };
                 }
             }
-            else
-            {
-                // declare a temp json object to store each agent item
-                JObject agentObj = new JObject();
-                agentObj.RemoveAll(); // clear the object
-
-                // iterate each column of the _agent_item
-                foreach (PropertyInfo property in _agent.GetType().GetProperties())
-                {
-                    // add all column names and values to temp, except "Password"
-                    switch (property.Name)
-                    {
-                        case "Password":
-                        case "Photo":
-                        case "Photo_Type":
-                            {
-                                break;
-                            }
-                        default:
-                            // add the column name and value to temp
-                            agentObj.Add(new JProperty(property.Name, property.GetValue(_agent)));
-                            break;
-                    }
-                }
-
-                int? roleId = _agent.LevelID; // obtain the role id from agent_info
-
-                // use the role id to find the corresponding role name and companies
-                var _role = (from _r in _scrme.user_roles
-                             where _r.RoleID == roleId
-                             select new
-                             {
-                                 _r.RoleName,
-                                 _r.Companies,
-                                 _r.Categories,
-                                 _r.Functions
-                             }).SingleOrDefault();
-
-                if (_role != null)
-                {
-                    // add role name and companies to _agentObj
-                    agentObj.Add(new JProperty("RoleName", _role.RoleName));
-                    agentObj.Add(new JProperty("Companies", _role.Companies));
-                    agentObj.Add(new JProperty("Categories", _role.Categories));
-                    agentObj.Add(new JProperty("Functions", _role.Functions));
-                }
-
-                agentObj.Add(new JProperty("Token", GenerateToken(Convert.ToString(_agent.AgentID))));
 
 
-                // obtain all data from table config
-                IQueryable<config> _config_details = (from _conf in _scrme.configs
-                                                                select _conf);
-
-                // declare new FieldDetails class object as List
-                List<ConfigDetails> _list_config_details = new List<ConfigDetails>();
-
-                // for existing config
-                if (_config_details.Count() > 0)
-                {
-                    // iterate through the rows from that field category
-                    foreach (config _config_item in _config_details)
-                    {
-                        // declare ConfigDetails class object
-                        ConfigDetails _cd = new ConfigDetails();
-
-                        // assign the id, name and details to the ConfigDetails object
-                        _cd.P_Id = _config_item.P_Id;
-                        _cd.P_Name = _config_item.P_Name;
-                        _cd.P_Value = _config_item.P_Value;
-
-                        // apend the object to the list
-                        _list_config_details.Add(_cd);
-                    }
-
-                    // for non-existing field category
-                }
-                else
-                {
-                    _list_config_details = null;
-                }
-
-                JArray configJson = (JArray)JToken.FromObject(_list_config_details);
-
-                // add config to _agentObj
-                agentObj.Add(new JProperty("config", configJson));
-               
-
-                allJsonResults = new JObject()
-                {
-                    new JProperty("result", "success"),
-                    new JProperty("details", agentObj)
-                };
-            }
             // return all results in json format
             return allJsonResults;
         }
