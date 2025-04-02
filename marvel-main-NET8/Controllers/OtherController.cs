@@ -305,12 +305,14 @@ namespace marvel_main_NET8.Controllers
                                  _r.Functions
                              }).SingleOrDefault();
 
-
-                // add role name and companies to _agentObj
-                agentObj.Add(new JProperty("RoleName", _role.RoleName));
-                agentObj.Add(new JProperty("Companies", _role.Companies));
-                agentObj.Add(new JProperty("Categories", _role.Categories));
-                agentObj.Add(new JProperty("Functions", _role.Functions));
+                if (_role != null)
+                {
+                    // add role name and companies to _agentObj
+                    agentObj.Add(new JProperty("RoleName", _role.RoleName));
+                    agentObj.Add(new JProperty("Companies", _role.Companies));
+                    agentObj.Add(new JProperty("Categories", _role.Categories));
+                    agentObj.Add(new JProperty("Functions", _role.Functions));
+                }
 
                 agentObj.Add(new JProperty("Token", GenerateToken(Convert.ToString(_agent.AgentID))));
 
