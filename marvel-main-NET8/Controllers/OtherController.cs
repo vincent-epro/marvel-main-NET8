@@ -49,6 +49,10 @@ namespace marvel_main_NET8.Controllers
 
         private const string Not_Auth_Desc = "Not Auth.";
 
+        private const string InputAuth_Agent_Id = "Agent_Id";
+        private const string InputAuth_Token = "Token";
+
+
         public static string GenerateToken(string P_Username)
         {
             byte[] _non_base64_secret = Convert.FromBase64String(Secret);
@@ -388,8 +392,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CreateUser([FromBody] JsonObject data)
         {
-            string token = (data["Token"] ?? "").ToString();
-            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -502,8 +506,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPut]
         public IActionResult UpdateUser([FromBody] JsonObject data)
         {
-            string token = (data["Token"] ?? "").ToString();
-            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -617,8 +621,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CheckAgentId([FromBody] JsonObject data)
         {
-            string token = (data["Token"] ?? "").ToString();
-            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -663,8 +667,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CheckSellerId([FromBody] JsonObject data)
         {
-            string token = (data["Token"] ?? "").ToString();
-            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -709,8 +713,8 @@ namespace marvel_main_NET8.Controllers
         public IActionResult GetRoles([FromBody] JsonObject data)
         {
             string status = (data["RoleStatus"] ?? "").ToString();
-            string token = (data["Token"] ?? "").ToString();
-            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -775,8 +779,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetAgentsOfRole([FromBody] JsonObject data)
         {
-            string token = (data["Token"] ?? "").ToString();
-            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -829,8 +833,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetLogin([FromBody] JsonObject data)
         {
-            string token = (data["Token"] ?? "").ToString();
-            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
