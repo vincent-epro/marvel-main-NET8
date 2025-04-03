@@ -242,7 +242,7 @@ namespace marvel_main_NET8.Controllers
                         agentObj.Add(new JProperty("Functions", _role.Functions));
                     }
 
-                    agentObj.Add(new JProperty("Token", GenerateToken(Convert.ToString(_agent.AgentID))));
+                    agentObj.Add(new JProperty(InputAuth_Token, GenerateToken(Convert.ToString(_agent.AgentID))));
 
 
                     // obtain all data from table config
@@ -354,7 +354,7 @@ namespace marvel_main_NET8.Controllers
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
-                        new JProperty("Token", GenerateToken(Convert.ToString(existing_agentid)))
+                        new JProperty(InputAuth_Token, GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else if (details == "Account has expired.")
@@ -364,7 +364,7 @@ namespace marvel_main_NET8.Controllers
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
-                        new JProperty("Token", GenerateToken(Convert.ToString(existing_agentid)))
+                        new JProperty(InputAuth_Token, GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else
