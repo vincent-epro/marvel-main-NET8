@@ -12,7 +12,10 @@ namespace marvel_main_NET8
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = null; // Disable camelCase
+            });
 
             // Add DbContext using environment variable
             var connectionString_SCRM = Environment.GetEnvironmentVariable("ConnectionString_SCRM");

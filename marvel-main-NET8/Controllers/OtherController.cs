@@ -382,6 +382,120 @@ namespace marvel_main_NET8.Controllers
 
 
 
+        // Create User
+        [Route("CreateUser")]
+        [HttpPost]
+        public IActionResult CreateUser([FromBody] JsonObject data)
+        {
+            string token = (data["Token"] ?? "").ToString();
+            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    return Ok(new { result = "success", details = CreateCRMUser(data) });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = "Not Auth." });
+                }
+
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = "cannot create user." });
+
+            }
+        }
+
+        private List<agentinfo> CreateCRMUser(JsonObject data)
+        {
+            // declare db table items
+            agentinfo _agent_item = new agentinfo();
+
+            // obtain form body values
+            int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
+            string sellerID = (data["SellerID"] ?? "").ToString();
+            string agentName = (data["AgentName"] ?? "").ToString();
+            string email = (data["Email"] ?? "").ToString();
+            string password = (data["Password"] ?? "").ToString();
+
+            string role = (data["Role"] ?? "").ToString();
+            int levelId = GetLevelId(role); // get level Id using the role name
+
+            string accountStatus = (data["Account_status"] ?? "").ToString();
+            string photoRemoved = (data["Photo_Removed"] ?? "").ToString();
+
+            // assign new agent record
+            _agent_item.AgentID = agentId;
+            _agent_item.SellerID = sellerID;
+            _agent_item.Counter = 0;
+            _agent_item.AgentName = agentName;
+            _agent_item.Email = email;
+            _agent_item.Password = password;
+            _agent_item.LevelID = levelId;
+            _agent_item.Account_status = accountStatus;
+            
+            int passwordChangeFrequency = GetPasswordChangeFrequency();
+            _agent_item.ExpiryDate = DateTime.Today.AddDays(passwordChangeFrequency);
+
+            if (photoRemoved == "Y")
+            {
+                _agent_item.Photo = null;
+                _agent_item.Photo_Type = null;
+            }
+
+            // add new user role record
+            _scrme.agentinfos.Add(_agent_item);
+
+            // save db changes
+            _scrme.SaveChanges();
+
+
+            // obtain the new agent from table "agentinfo"
+            List<agentinfo> _new_agent = (from _a in _scrme.agentinfos
+                                                     where _a.ColId == _agent_item.ColId
+                                                     select _a).ToList();
+
+
+            return _new_agent;
+        }
+
+
+        private int GetLevelId(string roleName)
+        {
+            int levelId = 0;
+
+            user_role? _linq_user_role = (from _r in _scrme.user_roles
+                                                   where _r.RoleName == roleName
+                                                   select _r).SingleOrDefault();
+
+            if (_linq_user_role != null)
+            {
+                levelId = _linq_user_role.RoleID;
+            }
+
+            return levelId;
+        }
+
+        private int GetPasswordChangeFrequency()
+        {
+            config? _config = (from _c in _scrme.configs
+                                        where _c.P_Name == "PasswordChangeFrequency"
+                                        select _c).SingleOrDefault<config>();
+
+            if (_config == null)
+            {
+                return 90;
+            }
+            else
+            {
+                return Convert.ToInt32(_config.P_Value);
+            }
+        }
+
+
         // Check Agent Id
         [Route("CheckAgentId")]
         [HttpPost]
