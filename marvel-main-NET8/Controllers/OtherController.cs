@@ -694,13 +694,15 @@ namespace marvel_main_NET8.Controllers
 
             if (_agents.Count() > 0)
             {
-                agentsOfRole = "The role is used by: ";
-                // iterate through each row of data in agentInfo
+                StringBuilder sb = new StringBuilder();
+                sb.Append("The role is used by: ");
+
                 foreach (agentinfo _agent_item in _agents)
                 {
-                    // append agent to the string
-                    agentsOfRole = agentsOfRole + _agent_item.AgentName + "(ID: " + _agent_item.AgentID + ")\n";
+                    sb.Append($"{_agent_item.AgentName}(ID: {_agent_item.AgentID})\n");
                 }
+
+                agentsOfRole = sb.ToString(); // Convert the StringBuilder content to a string
             }
 
             return agentsOfRole;
