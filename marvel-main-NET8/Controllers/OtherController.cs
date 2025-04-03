@@ -108,7 +108,7 @@ namespace marvel_main_NET8.Controllers
 
                 return _claims_principal;
             }
-            catch (Exception e)
+            catch (Exception )
             {
                 return null;
             }
@@ -139,7 +139,7 @@ namespace marvel_main_NET8.Controllers
             {
                 return Content(Logincrm(data).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
             }
-            catch (Exception err)
+            catch (Exception )
             {
                 return Ok(new { result = "fail", details = "Invalid Parameters" });
 
@@ -403,7 +403,7 @@ namespace marvel_main_NET8.Controllers
                 }
 
             }
-            catch (Exception err)
+            catch (Exception )
             {
                 return Ok(new { result = "fail", details = "cannot create user." });
 
@@ -493,6 +493,121 @@ namespace marvel_main_NET8.Controllers
             else
             {
                 return Convert.ToInt32(_config.P_Value);
+            }
+        }
+
+
+        // Update User
+        [Route("UpdateUser")]
+        [HttpPut]
+        public IActionResult UpdateUser([FromBody] JsonObject data)
+        {
+            string token = (data["Token"] ?? "").ToString();
+            string tk_agentId = (data["Agent_Id"] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    UpdateCRMUser(data);
+                    return Ok(new { result = "success", details = "updated user" });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private void UpdateCRMUser(JsonObject data)
+        {
+            // obtain form body values
+            int colId = Convert.ToInt32((data["ColId"] ?? "-1").ToString());
+
+            int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
+            string sellerID = (data["SellerID"] ?? "").ToString();
+            string agentName = (data["AgentName"] ?? "").ToString();
+            string email = (data["Email"] ?? "").ToString();
+            string password = (data["Password"] ?? "").ToString();
+
+            string role = (data["Role"] ?? "").ToString();
+            int levelId = GetLevelId(role); // get level Id using the role name
+
+            string accountStatus = (data["Account_status"] ?? "").ToString();
+            string photoRemoved = (data["Photo_Removed"] ?? "").ToString();
+
+            int counter = Convert.ToInt32((data["Counter"] ?? "-1").ToString());
+
+
+            // obtain single user record based on the agent id
+            agentinfo? _agent = (from _a in _scrme.agentinfos
+                                           where _a.ColId == colId
+                                           select _a).SingleOrDefault<agentinfo>();
+
+            // if there is at least 1 role
+            if (_agent != null)
+            {
+                // decide if it's update with agent id or update w/o agent id
+                if (_agent.AgentID == agentId && _agent.SellerID == sellerID)
+                {
+                    // assign the updated values to the row
+
+                    _agent.AgentName = agentName;
+                    _agent.Email = email;
+                    if (password != string.Empty)
+                    {
+                        _agent.Password = password;
+                        int passwordChangeFrequency = GetPasswordChangeFrequency();
+                        _agent.ExpiryDate = DateTime.Today.AddDays(passwordChangeFrequency); // only extend expiry date if password is changed
+                    }
+                    _agent.LevelID = levelId;
+                    _agent.Account_status = accountStatus;
+                    _agent.Counter = counter;
+
+                    if (photoRemoved == "Y")
+                    {
+                        _agent.Photo = null;
+                        _agent.Photo_Type = null;
+                    }
+
+                }
+                else
+                {
+                    // add a new row using the data above
+                    // declare db table items
+                    agentinfo _new_agent_item = new agentinfo();
+
+                    // assign new agent record
+                    _new_agent_item.AgentID = agentId;
+                    _new_agent_item.AgentName = agentName;
+                    _new_agent_item.Password = _agent.Password;
+                    _new_agent_item.LevelID = _agent.LevelID;
+                    _new_agent_item.SellerID = sellerID;
+                    _new_agent_item.Counter = _agent.Counter;
+                    int passwordChangeFrequency = GetPasswordChangeFrequency();
+                    
+                    _new_agent_item.ExpiryDate = DateTime.Today.AddDays(passwordChangeFrequency);
+                    _new_agent_item.LastLoginDate = _agent.LastLoginDate;
+                    _new_agent_item.Account_status = _agent.Account_status;
+                    _new_agent_item.Email = _agent.Email;
+
+                    if (photoRemoved == "Y")
+                    {
+                        _new_agent_item.Photo = null;
+                        _new_agent_item.Photo_Type = null;
+                    }
+
+                    // delete the old row
+                    _scrme.agentinfos.Remove(_agent);
+
+                    // add the new row
+                    _scrme.agentinfos.Add(_new_agent_item);
+                }
+                _scrme.SaveChanges(); // save changes to db
             }
         }
 
