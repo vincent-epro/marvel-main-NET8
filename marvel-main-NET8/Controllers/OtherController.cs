@@ -44,9 +44,10 @@ namespace marvel_main_NET8.Controllers
             _scrme = context;
         }
 
-
         // JWT
         private static readonly string Secret = Environment.GetEnvironmentVariable("JWT_Secret") ?? "";
+
+        private const string Not_Auth_Desc = "Not Auth.";
 
         public static string GenerateToken(string P_Username)
         {
@@ -398,7 +399,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = "Not Auth." });
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
                 }
 
             }
@@ -513,7 +514,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = "Not Auth." });
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
                 }
 
             }
@@ -559,7 +560,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = "Not Auth." });
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -604,7 +605,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = "Not Auth." });
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
                 }
 
             }
@@ -671,7 +672,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = "Not Auth." });
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -722,7 +723,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = "Not Auth." });
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
                 }
 
             }
