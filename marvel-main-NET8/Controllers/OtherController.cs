@@ -924,9 +924,126 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Change Password
+        [Route("ChangePassword")]
+        [HttpPut]
+        public IActionResult ChangePassword([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    string changeResult = ChangeUserPassword(data);
+                    return Ok(new { result = "success", details = changeResult });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception)
+            {
+                return Ok(new { result = "fail", details = "cannot change password" });
+            }
+        }
+
+        private string ChangeUserPassword(JsonObject data)
+        {
+            string sellerId = (data["SellerID"] ?? "").ToString();
+            string oldPassword = (data["Old_Password"] ?? "").ToString();
+            string password = (data["Password"] ?? "").ToString();
+
+            // obtain single user record based on the agent id
+            agentinfo? _agent = (from _a in _scrme.agentinfos
+                                           where _a.SellerID == sellerId
+                                           select _a).SingleOrDefault<agentinfo>();
+
+            // agent exists
+            if (_agent != null)
+            {
+                if (_agent.Password == oldPassword)
+                {
+                    int pwd_reuse_times = GetPasswordReUseTimes();
+
+                    IQueryable<String> _h;
+
+                    _h = (from _a in _scrme.password_logs
+                          where _a.AgentID == _agent.AgentID
+                          orderby _a.Created_Time descending
+                          select _a.Password).Take(pwd_reuse_times);
+
+                    List<String> _h_list = _h.ToList<String>();
+
+                    bool isDup;
+
+                    isDup = _h_list.Contains(password);
+
+                    if (isDup)
+                    {
+                        return "The new password has been used before.";
+                    }
+                    else
+                    {
+                        // assign the updated values to the row
+                        _agent.Password = password;
+                        int passwordChangeFrequency = GetPasswordChangeFrequency();
+                        _agent.ExpiryDate = DateTime.Now.AddDays(passwordChangeFrequency); // extend the account expiry date
+
+                        _agent.LastLoginDate = DateTime.Now;
+
+
+                        _scrme.SaveChanges(); // save changes to db
+
+                        // Insert password log
+                        password_log _new_pw_item = new password_log();
+
+                        _new_pw_item.Password = password;
+                        _new_pw_item.AgentID = _agent.AgentID;
+                        _new_pw_item.Created_Time = DateTime.Now;
+
+                        _scrme.password_logs.Add(_new_pw_item);
+
+                        _scrme.SaveChanges();
+
+
+                        return "password is changed.";
+                    }
+
+                }
+                else
+                {
+                    return "The existing password does not match with our record.";
+                }
+            }
+            else
+            {
+                return "Invalid seller ID.";
+            }
+        }
+
+        private int GetPasswordReUseTimes()
+        {
+            config? _config = (from _c in _scrme.configs
+                               where _c.P_Name == "PasswordReUseTimes"
+                               select _c).SingleOrDefault<config>();
+
+            if (_config == null)
+            {
+                return 5;
+            }
+            else
+            {
+                return Convert.ToInt32(_config.P_Value);
+            }
+        }
+
+
 
 
 
     }
 
-    }
+}

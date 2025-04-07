@@ -19,6 +19,8 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<config> configs { get; set; }
 
+    public virtual DbSet<password_log> password_logs { get; set; }
+
     public virtual DbSet<user_role> user_roles { get; set; }
 
 
@@ -62,6 +64,20 @@ public partial class ScrmDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.P_Value).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<password_log>(entity =>
+        {
+            entity.HasKey(e => e.P_Id);
+
+            entity.ToTable("password_log");
+
+            entity.HasIndex(e => e.AgentID, "IX_AgentID");
+
+            entity.Property(e => e.Created_Time).HasColumnType("datetime");
+            entity.Property(e => e.Password)
+                .HasMaxLength(500)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<user_role>(entity =>
