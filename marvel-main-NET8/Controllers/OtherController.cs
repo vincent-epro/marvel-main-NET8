@@ -47,6 +47,8 @@ namespace marvel_main_NET8.Controllers
         // JWT
         private static readonly string Secret = Environment.GetEnvironmentVariable("JWT_Secret") ?? "";
 
+        private const string OutputResult_SUCC = "success";
+
         private const string Not_Auth_Desc = "Not Auth.";
 
         private const string InputAuth_Agent_Id = "Agent_Id";
@@ -289,7 +291,7 @@ namespace marvel_main_NET8.Controllers
 
                     allJsonResults = new JObject()
                     {
-                        new JProperty("result", "success"),
+                        new JProperty("result", OutputResult_SUCC),
                         new JProperty("details", agentObj)
                     };
 
@@ -399,7 +401,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (Authenticated(token, tk_agentId))
                 {
-                    return Ok(new { result = "success", details = CreateCRMUser(data) });
+                    return Ok(new { result = OutputResult_SUCC, details = CreateCRMUser(data) });
                 }
                 else
                 {
@@ -514,7 +516,7 @@ namespace marvel_main_NET8.Controllers
                 if (Authenticated(token, tk_agentId))
                 {
                     UpdateCRMUser(data);
-                    return Ok(new { result = "success", details = "updated user" });
+                    return Ok(new { result = OutputResult_SUCC, details = "updated user" });
                 }
                 else
                 {
@@ -766,7 +768,7 @@ namespace marvel_main_NET8.Controllers
 
             JObject rolesJson = new JObject() // add to overall json object
                     {
-                        new JProperty("result", "success"),
+                        new JProperty("result", OutputResult_SUCC),
                         new JProperty("details", roleListJason)
                     };
 
@@ -787,7 +789,7 @@ namespace marvel_main_NET8.Controllers
                 if (Authenticated(token, tk_agentId))
                 {
                     string agentsOfRole = GetAgentlistByRole(data);
-                    return Ok(new { result = "success", details = agentsOfRole });
+                    return Ok(new { result = OutputResult_SUCC, details = agentsOfRole });
                 }
                 else
                 {
@@ -915,7 +917,7 @@ namespace marvel_main_NET8.Controllers
             // set up _all_results json data
             JObject allJsonResults = new JObject()
             {
-                new JProperty("result", "success"),
+                new JProperty("result", OutputResult_SUCC),
                 new JProperty("details", _agent_list)
             };
 
@@ -937,7 +939,7 @@ namespace marvel_main_NET8.Controllers
                 if (Authenticated(token, tk_agentId))
                 {
                     string changeResult = ChangeUserPassword(data);
-                    return Ok(new { result = "success", details = changeResult });
+                    return Ok(new { result = OutputResult_SUCC, details = changeResult });
                 }
                 else
                 {
