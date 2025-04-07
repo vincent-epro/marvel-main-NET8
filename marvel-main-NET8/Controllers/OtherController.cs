@@ -830,6 +830,140 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Create Role
+        [Route("CreateRole")]
+        [HttpPost]
+        public IActionResult CreateRole([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    return Ok(new { result = OutputResult_SUCC, details = CreateCRMRole(data) });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+
+            }
+        }
+
+        private List<user_role> CreateCRMRole(JsonObject data)
+        {
+            // declare db table items
+            user_role _user_role_item = new user_role();
+
+            string roleName = (data["RoleName"] ?? "").ToString();
+            string companies = (data["Companies"] ?? "").ToString();
+            string categories = (data["Categories"] ?? "").ToString();
+            string functions = (data["Functions"] ?? "").ToString();
+            string roleStatus = (data["RoleStatus"] ?? "").ToString();
+
+
+            // assign new user role record
+            _user_role_item.RoleName = roleName;
+            _user_role_item.Companies = companies;
+            _user_role_item.Categories = categories;
+            _user_role_item.Functions = functions;
+            _user_role_item.RoleStatus = roleStatus;
+
+            // add new user role record
+            _scrme.user_roles.Add(_user_role_item);
+
+            // save db changes
+            _scrme.SaveChanges();
+
+            int roleID = _user_role_item.RoleID;
+
+            // obtain the new user role from table "user_role"
+            List<user_role> _linq_user_role = (from _r in _scrme.user_roles
+                                                         where _r.RoleID == roleID
+                                                         select _r).ToList();
+
+            return _linq_user_role;
+        }
+
+
+        // Update Role
+        [Route("UpdateRole")]
+        [HttpPut]
+        public IActionResult UpdateRole([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    UpdateCRMRole(data);
+                    return Ok(new { result = OutputResult_SUCC, details = "updated user role" });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+
+        private void UpdateCRMRole(JsonObject data)
+        {
+            int roleID = Convert.ToInt32((data["RoleID"] ?? "-1").ToString());
+
+            // declare a dictionary object where key = fieldName, value = fieldValue
+            Dictionary<string, string> fieldsToBeUpdatedDict = new Dictionary<string, string>();
+
+            // iterate through data and add the field names and field values to the dictionary
+            foreach (var item in data)
+            {
+                // obtain form parameters to local variables
+                string fieldName = item.Key;
+                string fieldValue = item.Value?.ToString() ?? string.Empty;
+
+                if (fieldName != "RoleID" && fieldName != "Agent_Id" && fieldName != "Token")
+                {
+                    fieldsToBeUpdatedDict.Add(fieldName, fieldValue); // add non-RoleID fields to the Dictionary
+                }
+            }
+
+            // obtain single role record based on the role id
+            user_role? _role = (from _r in _scrme.user_roles
+                                         where _r.RoleID == roleID
+                                         select _r).SingleOrDefault<user_role>();
+
+            // if there is at least 1 role
+            if (_role != null)
+            {
+                // iterate through the dictionary
+                foreach (KeyValuePair<string, string> fields in fieldsToBeUpdatedDict)
+                {
+                    // find the column name that matches with the field name in dictionary
+                    PropertyInfo? properInfo = _role.GetType().GetProperty(fields.Key);
+
+                    // set the field value
+                    properInfo?.SetValue(_role, (fields.Value == null ? string.Empty : fields.Value));
+                }
+
+                _scrme.SaveChanges();
+            }
+
+        }
+
+
         // Retrieve login details
         [Route("GetLogin")]
         [HttpPost]
