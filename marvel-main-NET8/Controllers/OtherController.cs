@@ -1231,8 +1231,6 @@ namespace marvel_main_NET8.Controllers
                          }).Take(500);
             }
 
-
-
             // declare a json object to contain all rows of data
             //  JObject allJsonResults = new JObject(); //old
             JObject allJsonResults;
@@ -1263,7 +1261,7 @@ namespace marvel_main_NET8.Controllers
                 // add the log list to jobject
                 allJsonResults = new JObject()
                 {
-                     new JProperty("result", "success"),
+                     new JProperty("result", OutputResult_SUCC),
                      new JProperty("details", jsonList)
                 };
 
@@ -1272,7 +1270,7 @@ namespace marvel_main_NET8.Controllers
             {
                 allJsonResults = new JObject()
                 {
-                     new JProperty("result", "success"),
+                     new JProperty("result", OutputResult_SUCC),
                      new JProperty("details", jsonList)
                 };
             }
