@@ -19,6 +19,10 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<config> configs { get; set; }
 
+    public virtual DbSet<field> fields { get; set; }
+
+    public virtual DbSet<field_option> field_options { get; set; }
+
     public virtual DbSet<floor_plan> floor_plans { get; set; }
 
     public virtual DbSet<password_log> password_logs { get; set; }
@@ -66,6 +70,31 @@ public partial class ScrmDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.P_Value).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<field>(entity =>
+        {
+            entity.HasKey(e => new { e.Field_Category, e.Field_Name });
+
+            entity.ToTable("field");
+
+            entity.Property(e => e.Field_Category).HasMaxLength(50);
+            entity.Property(e => e.Field_Name).HasMaxLength(100);
+            entity.Property(e => e.Field_Display).HasMaxLength(200);
+            entity.Property(e => e.Field_Tag).HasMaxLength(50);
+            entity.Property(e => e.Field_Type).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<field_option>(entity =>
+        {
+            entity.HasKey(e => new { e.Field_Name, e.Field_Option }).HasName("PK_Field_Option");
+
+            entity.ToTable("field_option");
+
+            entity.Property(e => e.Field_Name)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Field_Option).HasMaxLength(50);
         });
 
         modelBuilder.Entity<floor_plan>(entity =>
