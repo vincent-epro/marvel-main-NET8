@@ -1606,6 +1606,56 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Get Schedule Setting
+        [Route("GetScheduleSetting")]
+        [HttpPost]
+        public IActionResult GetScheduleSetting([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    List<task_schedule_setting> _list_cont = GetCRM_ScheduleSetting();
+
+                    if (_list_cont != null)
+                    {
+                        // return successful get and display the list of data
+                        return Ok(new { result = OutputResult_SUCC, details = _list_cont });
+                    }
+                    else
+                    {
+                        // return unsuccessful get
+                        return Ok(new { result = "fail", details = "does not exist" });
+                    }
+
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private List<task_schedule_setting> GetCRM_ScheduleSetting()
+        {
+            // obtain results
+            IQueryable<task_schedule_setting> _sch = from _r in _scrme.task_schedule_settings
+                                                               where _r.Status == "Active"
+                                                               select _r;
+
+            return _sch.ToList();
+        }
+
+
+
+
 
     }
 

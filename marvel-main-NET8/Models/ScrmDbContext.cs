@@ -27,6 +27,10 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<password_log> password_logs { get; set; }
 
+    public virtual DbSet<task_schedule_record> task_schedule_records { get; set; }
+
+    public virtual DbSet<task_schedule_setting> task_schedule_settings { get; set; }
+
     public virtual DbSet<user_role> user_roles { get; set; }
 
 
@@ -122,6 +126,42 @@ public partial class ScrmDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(500)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<task_schedule_record>(entity =>
+        {
+            entity.HasKey(e => e.R_Id);
+
+            entity.ToTable("task_schedule_record");
+
+            entity.HasIndex(e => e.Handle_By, "IX_Handle_By");
+
+            entity.HasIndex(e => e.Handle_Time, "IX_Handle_Time");
+
+            entity.Property(e => e.Alert_Time).HasColumnType("datetime");
+            entity.Property(e => e.Handle_Time).HasColumnType("datetime");
+            entity.Property(e => e.Schedule_Type).HasMaxLength(50);
+            entity.Property(e => e.Service).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<task_schedule_setting>(entity =>
+        {
+            entity.HasKey(e => e.S_Id);
+
+            entity.ToTable("task_schedule_setting");
+
+            entity.HasIndex(e => e.Schedule_Time, "IX_Schedule_Time");
+
+            entity.HasIndex(e => e.Schedule_Type, "IX_Schedule_Type");
+
+            entity.HasIndex(e => e.Status, "IX_Status");
+
+            entity.Property(e => e.Created_Time).HasColumnType("datetime");
+            entity.Property(e => e.Schedule_Time).HasColumnType("datetime");
+            entity.Property(e => e.Schedule_Type).HasMaxLength(50);
+            entity.Property(e => e.Service).HasMaxLength(100);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.Updated_Time).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<user_role>(entity =>
