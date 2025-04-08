@@ -1218,7 +1218,7 @@ namespace marvel_main_NET8.Controllers
                          where _m.F_Id == fid
                          select _m);
             }
-            else
+            else if (ftype == "simple")
             {
                 _info = (from _m in _scrme.floor_plans
                          select new
@@ -1229,15 +1229,18 @@ namespace marvel_main_NET8.Controllers
                              Status = _m.Status
                          }).Take(500);
             }
+            else // Default fallback for unknown ftype
+            {
+                _info = Enumerable.Empty<object>(); // Initializes as an empty enumerable
+            }
 
 
             // declare a json object to contain all rows of data
-          //  JObject allJsonResults = new JObject(); //old
+            //  JObject allJsonResults = new JObject(); //old
             JObject allJsonResults;
 
             // declare a list of json objects containing the each row of data
             List<JObject> jsonList = new List<JObject>();
-
 
             // return results in list or null
             if (_info != null)
