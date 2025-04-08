@@ -1178,6 +1178,216 @@ namespace marvel_main_NET8.Controllers
 
 
 
+        // Get Floor Plan
+        [Route("GetFloorPlan")]
+        [HttpPost]
+        public IActionResult GetFloorPlan([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            string ftype = (data["F_Type"] ?? "").ToString();
+            int fid = Convert.ToInt32((data["F_Id"] ?? "-1").ToString());
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    return Content(GetCRM_FloorPlan(ftype, fid).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+
+            }
+        }
+
+        private JObject GetCRM_FloorPlan(string ftype, int fid)
+        {
+            var _info = (dynamic?)null;
+
+            if (ftype == "full")
+            {
+                _info = (from _m in _scrme.floor_plans
+                         where _m.F_Id == fid
+                         select _m);
+            }
+            else
+            {
+                _info = (from _m in _scrme.floor_plans
+                         select new
+                         {
+                             F_Id = _m.F_Id,
+                             Name = _m.Name,
+                             Ordering = _m.Ordering,
+                             Status = _m.Status
+                         }).Take(500);
+            }
+
+
+            // declare a json object to contain all rows of data
+          //  JObject allJsonResults = new JObject(); //old
+            JObject allJsonResults;
+
+            // declare a list of json objects containing the each row of data
+            List<JObject> jsonList = new List<JObject>();
+
+
+            // return results in list or null
+            if (_info != null)
+            {
+                // iterate through 
+                foreach (var _item in _info)
+                {
+                    // declare a temp json object to store each 
+                    JObject tempJson = new JObject();
+                    tempJson.RemoveAll(); // clear the object
+
+                    // iterate each column 
+                    foreach (PropertyInfo property in _item.GetType().GetProperties())
+                    {
+
+                        tempJson.Add(new JProperty(property.Name, property.GetValue(_item)));
+                    }
+
+                    jsonList.Add(tempJson); // add the temp result to the list
+                }
+
+                // add the log list to jobject
+                allJsonResults = new JObject()
+                {
+                     new JProperty("result", "success"),
+                     new JProperty("details", jsonList)
+                };
+
+            }
+            else
+            {
+                allJsonResults = new JObject()
+                {
+                     new JProperty("result", "success"),
+                     new JProperty("details", null)
+                };
+            }
+
+            return allJsonResults;
+        }
+
+
+        // Add Floor Plan
+        [Route("AddFloorPlan")]
+        [HttpPost]
+        public IActionResult AddFloorPlan([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    addCRM_FloorPlan(data);
+                    return Ok(new { result = OutputResult_SUCC, details = "inserted" });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private void addCRM_FloorPlan(JsonObject data)
+        {
+            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+
+            floor_plan _new_fp_item = new floor_plan();
+
+            _new_fp_item.Name = (data["Name"] ?? "").ToString();
+            _new_fp_item.Ordering = Convert.ToInt32((data["Ordering"] ?? "-1").ToString());
+            _new_fp_item.Value = (data["Value"] ?? "").ToString();
+            _new_fp_item.Background = (data["Background"] ?? "").ToString();
+            _new_fp_item.Style = (data["Style"] ?? "").ToString();
+            _new_fp_item.Remarks = (data["Remarks"] ?? "").ToString();
+            _new_fp_item.Status = "Active";
+
+            _new_fp_item.Created_By = agentId;
+            _new_fp_item.Created_Time = DateTime.Now;
+            _new_fp_item.Updated_By = agentId;
+            _new_fp_item.Updated_Time = DateTime.Now;
+
+            _scrme.floor_plans.Add(_new_fp_item);
+
+            _scrme.SaveChanges();
+
+        }
+
+
+        // Update Floor Plan
+        [Route("UpdateFloorPlan")]
+        [HttpPut]
+        public IActionResult UpdateFloorPlan([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    updateCRM_FloorPlan(data);
+                    return Ok(new { result = OutputResult_SUCC, details = "updated" });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private void updateCRM_FloorPlan([FromBody] dynamic data)
+        {
+            int fID = Convert.ToInt32((data["F_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+
+            var _ss = (from _c in _scrme.floor_plans
+                       where _c.F_Id == fID
+                       select _c).SingleOrDefault<floor_plan>();
+
+            // exists in table
+            if (_ss != null)
+            {
+                _ss.Name = (data["Name"] ?? "").ToString();
+                _ss.Ordering = Convert.ToInt32((data["Ordering"] ?? "-1").ToString());
+                _ss.Value = (data["Value"] ?? "").ToString();
+                _ss.Background = (data["Background"] ?? "").ToString();
+                _ss.Style = (data["Style"] ?? "").ToString();
+                _ss.Remarks = (data["Remarks"] ?? "").ToString();
+                _ss.Status = (data["Status"] ?? "").ToString();
+
+                _ss.Updated_By = agentId;
+                _ss.Updated_Time = DateTime.Now;
+
+                _scrme.SaveChanges();
+
+            }
+
+        }
+
+
 
 
     }

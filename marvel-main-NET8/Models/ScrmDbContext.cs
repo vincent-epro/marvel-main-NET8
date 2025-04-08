@@ -19,6 +19,8 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<config> configs { get; set; }
 
+    public virtual DbSet<floor_plan> floor_plans { get; set; }
+
     public virtual DbSet<password_log> password_logs { get; set; }
 
     public virtual DbSet<user_role> user_roles { get; set; }
@@ -64,6 +66,19 @@ public partial class ScrmDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.P_Value).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<floor_plan>(entity =>
+        {
+            entity.HasKey(e => e.F_Id);
+
+            entity.ToTable("floor_plan");
+
+            entity.Property(e => e.Created_Time).HasColumnType("datetime");
+            entity.Property(e => e.Name).HasMaxLength(200);
+            entity.Property(e => e.Status).HasMaxLength(20);
+            entity.Property(e => e.Style).HasMaxLength(500);
+            entity.Property(e => e.Updated_Time).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<password_log>(entity =>
