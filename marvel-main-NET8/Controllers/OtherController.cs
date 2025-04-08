@@ -1272,7 +1272,7 @@ namespace marvel_main_NET8.Controllers
                 allJsonResults = new JObject()
                 {
                      new JProperty("result", "success"),
-                     new JProperty("details", null)
+                     new JProperty("details", jsonList)
                 };
             }
 
