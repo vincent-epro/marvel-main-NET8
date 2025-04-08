@@ -1424,30 +1424,22 @@ namespace marvel_main_NET8.Controllers
 
                 if (Authenticated(token, tk_agentId))
                 {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(memoryStream); // Read file asynchronously
+                        byte[] photo = memoryStream.ToArray();
+                        string photoType = file.ContentType;
 
-                    if (agentId == 0) // cannot obtain agent id
-                    {
-                        return Ok(new { result = "fail", details = "Invalid Parameters." });
-                    }
-                    else
-                    {
-                        using (var memoryStream = new MemoryStream())
+                        // Save the photo and obtain the save status
+                        string saveStatus = SaveCRM_AgentPhoto(agentId, photo, photoType);
+
+                        if (saveStatus == "success")
                         {
-                            await file.CopyToAsync(memoryStream); // Read file asynchronously
-                            byte[] photo = memoryStream.ToArray();
-                            string photoType = file.ContentType;
-
-                            // Save the photo and obtain the save status
-                            string saveStatus = SaveCRM_AgentPhoto(agentId, photo, photoType);
-
-                            if (saveStatus == "success")
-                            {
-                                return Ok(new { result = OutputResult_SUCC, details = "" });
-                            }
-                            else
-                            {
-                                return Ok(new { result = "fail", details = "No such record." });
-                            }
+                            return Ok(new { result = OutputResult_SUCC, details = "" });
+                        }
+                        else
+                        {
+                            return Ok(new { result = "fail", details = "No such record." });
                         }
                     }
 
