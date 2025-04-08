@@ -1387,6 +1387,102 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Upload Photo
+        [Route("UploadPhoto")]
+        [HttpPost]
+        public async Task<IActionResult> UploadPhoto()
+        {
+            try
+            {
+                string token = string.Empty;
+                string tk_agentId = string.Empty;
+
+                // Access the HTTP context directly from the ControllerBase
+                var file = Request.Form.Files[0];
+
+                int agentId = 0;
+
+                foreach (var key in Request.Form.Keys)
+                {
+                    if (key == "To_Change_Id")
+                    {
+                        agentId = Convert.ToInt32(Request.Form[key]);
+                    }
+                    else if (key == "Agent_Id")
+                    {
+                        tk_agentId = Convert.ToString(Request.Form[key]);
+                    }
+                    else if (key == "Token")
+                    {
+                        token = Request.Form[key];
+                    }
+                }
+
+
+
+                if (Authenticated(token, tk_agentId))
+                {
+
+                    if (agentId == 0) // cannot obtain agent id
+                    {
+                        return Ok(new { result = "fail", details = "Invalid Parameters." });
+                    }
+                    else
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await file.CopyToAsync(memoryStream); // Read file asynchronously
+                            byte[] photo = memoryStream.ToArray();
+                            string photoType = file.ContentType;
+
+                            // Save the photo and obtain the save status
+                            string saveStatus = SaveCRM_AgentPhoto(agentId, photo, photoType);
+
+                            if (saveStatus == "success")
+                            {
+                                return Ok(new { result = OutputResult_SUCC, details = "" });
+                            }
+                            else
+                            {
+                                return Ok(new { result = "fail", details = "No such record." });
+                            }
+                        }
+                    }
+
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private string SaveCRM_AgentPhoto(int agentId, byte[] photo, string fileType)
+        {
+            // obtain the row of data with the given agent id
+            agentinfo? _agent = (from _a in _scrme.agentinfos
+                                           where _a.AgentID == agentId
+                                           select _a).SingleOrDefault();
+            if (_agent == null)
+            {
+                return "fail";
+            }
+            else // contact exists
+            {
+                _agent.Photo = photo; // assign the file to Photo column in table
+                _agent.Photo_Type = fileType; // assign the file type to Photo_Type column
+                _scrme.SaveChanges(); // save to database
+
+                return "success";
+            }
+        }
+
+
+
 
 
     }
