@@ -1397,7 +1397,10 @@ namespace marvel_main_NET8.Controllers
                 string token = string.Empty;
                 string tk_agentId = string.Empty;
 
-                // Access the HTTP context directly from the ControllerBase
+                if (Request.Form.Files.Count == 0)
+                {
+                    return Ok(new { result = "fail", details = "No file was uploaded." });
+                }
                 var file = Request.Form.Files[0];
 
                 int agentId = 0;
@@ -1417,7 +1420,6 @@ namespace marvel_main_NET8.Controllers
                         token = Request.Form[key];
                     }
                 }
-
 
 
                 if (Authenticated(token, tk_agentId))
