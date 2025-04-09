@@ -10,9 +10,7 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+
 
 namespace marvel_main_NET8.Controllers
 {
@@ -65,93 +63,14 @@ namespace marvel_main_NET8.Controllers
             _scrme = context;
         }
 
-        // JWT
-        private static readonly string Secret = Environment.GetEnvironmentVariable("JWT_Secret") ?? "";
 
-        private const string OutputResult_SUCC = "success";
+        public const string OutputResult_SUCC = "success";
 
-        private const string Not_Auth_Desc = "Not Auth.";
+        public const string Not_Auth_Desc = "Not Auth.";
 
-        private const string InputAuth_Agent_Id = "Agent_Id";
-        private const string InputAuth_Token = "Token";
+        public const string InputAuth_Agent_Id = "Agent_Id";
+        public const string InputAuth_Token = "Token";
 
-
-        public static string GenerateToken(string P_Username)
-        {
-            byte[] _non_base64_secret = Convert.FromBase64String(Secret);
-            SymmetricSecurityKey _symmetric_security_key = new SymmetricSecurityKey(_non_base64_secret);
-
-            ClaimsIdentity _claims_identity = new ClaimsIdentity();
-            _claims_identity.AddClaim(new Claim(ClaimTypes.Name, P_Username));
-
-            SecurityTokenDescriptor _security_token_descriptor = new SecurityTokenDescriptor
-            {
-                Subject = _claims_identity,
-                Expires = DateTime.UtcNow.AddMinutes(60 * 24),
-                SigningCredentials = new SigningCredentials(_symmetric_security_key, SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            JwtSecurityTokenHandler _jwt_security_token_handler = new JwtSecurityTokenHandler();
-            JwtSecurityToken _jwt_security_token = _jwt_security_token_handler.CreateJwtSecurityToken(_security_token_descriptor);
-            return _jwt_security_token_handler.WriteToken(_jwt_security_token);
-        }
-
-        public static string? ValidateToken(string P_Token)
-        {
-            ClaimsIdentity? _claims_identity;
-
-            ClaimsPrincipal? _claims_principal = GetClaimsPrincipal(P_Token);
-            if (_claims_principal == null) return null;
-
-
-            _claims_identity = (ClaimsIdentity?)_claims_principal.Identity;
-
-
-            Claim? _claim_name = _claims_identity?.FindFirst(ClaimTypes.Name);
-            return _claim_name?.Value; // username
-        }
-
-        public static ClaimsPrincipal? GetClaimsPrincipal(string P_Token)
-        {
-            try
-            {
-                JwtSecurityTokenHandler _jwt_security_token_handler = new JwtSecurityTokenHandler();
-                JwtSecurityToken _jwt_security_token = (JwtSecurityToken)_jwt_security_token_handler.ReadToken(P_Token);
-
-                if (_jwt_security_token == null) return null;
-
-                byte[] _non_base64_secret = Convert.FromBase64String(Secret);
-
-                TokenValidationParameters _token_validation_parameters = new TokenValidationParameters()
-                {
-                    RequireExpirationTime = true,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(_non_base64_secret)
-                };
-
-                SecurityToken _security_token;
-                ClaimsPrincipal _claims_principal = _jwt_security_token_handler.ValidateToken(P_Token, _token_validation_parameters, out _security_token);
-
-                return _claims_principal;
-            }
-            catch (Exception )
-            {
-                return null;
-            }
-        }
-
-        public static bool Authenticated(string token, string P_Username)
-        {
-            if (string.IsNullOrEmpty(token) ||
-                string.IsNullOrEmpty(P_Username))
-            {
-                return false;
-            }
-
-            return ValidateToken(token) == P_Username;
-
-        }
 
 
 
@@ -265,7 +184,7 @@ namespace marvel_main_NET8.Controllers
                         agentObj.Add(new JProperty("Functions", _role.Functions));
                     }
 
-                    agentObj.Add(new JProperty(InputAuth_Token, GenerateToken(Convert.ToString(_agent.AgentID))));
+                    agentObj.Add(new JProperty(InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(_agent.AgentID))));
 
 
                     // obtain all data from table config
@@ -377,7 +296,7 @@ namespace marvel_main_NET8.Controllers
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
-                        new JProperty(InputAuth_Token, GenerateToken(Convert.ToString(existing_agentid)))
+                        new JProperty(InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else if (details == "Account has expired.")
@@ -387,7 +306,7 @@ namespace marvel_main_NET8.Controllers
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
-                        new JProperty(InputAuth_Token, GenerateToken(Convert.ToString(existing_agentid)))
+                        new JProperty(InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else
@@ -420,7 +339,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     return Ok(new { result = OutputResult_SUCC, details = CreateCRMUser(data) });
                 }
@@ -534,7 +453,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     UpdateCRMUser(data);
                     return Ok(new { result = OutputResult_SUCC, details = "updated user" });
@@ -649,7 +568,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     bool isExists = UserExists(data);
                     return Ok(new { result = isExists });
@@ -695,7 +614,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     bool isExists = SellerIdExists(data);
                     return Ok(new { result = isExists });
@@ -741,7 +660,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     return Content(GetRoleinfo(status).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
                 }
@@ -807,7 +726,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     string agentsOfRole = GetAgentlistByRole(data);
                     return Ok(new { result = OutputResult_SUCC, details = agentsOfRole });
@@ -861,7 +780,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     return Ok(new { result = OutputResult_SUCC, details = CreateCRMRole(data) });
                 }
@@ -924,7 +843,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     UpdateCRMRole(data);
                     return Ok(new { result = OutputResult_SUCC, details = "updated user role" });
@@ -995,7 +914,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     return Content(GetLoginInfo().ToString(), "application/json; charset=utf-8", Encoding.UTF8);
                 }
@@ -1091,7 +1010,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     string changeResult = ChangeUserPassword(data);
                     return Ok(new { result = OutputResult_SUCC, details = changeResult });
@@ -1212,7 +1131,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     return Content(GetCRM_FloorPlan(ftype, fid).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
                 }
@@ -1310,7 +1229,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     addCRM_FloorPlan(data);
                     return Ok(new { result = OutputResult_SUCC, details = "inserted" });
@@ -1362,7 +1281,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     updateCRM_FloorPlan(data);
                     return Ok(new { result = OutputResult_SUCC, details = "updated" });
@@ -1445,7 +1364,7 @@ namespace marvel_main_NET8.Controllers
                 }
 
 
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     using (var memoryStream = new MemoryStream())
                     {
@@ -1509,7 +1428,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
 
                     // declare a dictionary object where key = Field_Category, value = FieldDetails's values
@@ -1616,7 +1535,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     List<task_schedule_setting> _list_cont = GetCRM_ScheduleSetting();
 
@@ -1664,7 +1583,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     addCRM_ScheduleSetting(data);
                     return Ok(new { result = OutputResult_SUCC, details = "inserted" });
@@ -1714,7 +1633,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     updateCRM_ScheduleSetting(data);
                     return Ok(new { result = OutputResult_SUCC, details = "updated" });
@@ -1781,7 +1700,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     List<task_schedule_record> _list_cont = CheckCRM_ScheduleAlert();
 
@@ -1829,7 +1748,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     HandleCRM_ScheduleAlert(data);
                     return Ok(new { result = OutputResult_SUCC, details = "updated" });
@@ -1879,7 +1798,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                if (Authenticated(token, tk_agentId))
+                if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     string searchtype = (data["Search_Type"] ?? "").ToString();
 
