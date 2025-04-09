@@ -1771,6 +1771,181 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Check Schedule Alert
+        [Route("CheckScheduleAlert")]
+        [HttpPost]
+        public IActionResult CheckScheduleAlert([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    List<task_schedule_record> _list_cont = CheckCRM_ScheduleAlert();
+
+                    if (_list_cont != null)
+                    {
+                        // return successful get and display the list of data
+                        return Ok(new { result = OutputResult_SUCC, details = _list_cont });
+                    }
+                    else
+                    {
+                        // return unsuccessful get
+                        return Ok(new { result = "fail", details = "does not exist" });
+                    }
+
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private List<task_schedule_record> CheckCRM_ScheduleAlert()
+        {
+            // obtain results
+            IQueryable<task_schedule_record> _sch = from _r in _scrme.task_schedule_records
+                                                              where _r.Handle_By == null
+                                                              select _r;
+
+            return _sch.ToList();
+        }
+
+
+        // Handle Schedule Alert
+        [Route("HandleScheduleAlert")]
+        [HttpPut]
+        public IActionResult HandleScheduleAlert([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    HandleCRM_ScheduleAlert(data);
+                    return Ok(new { result = OutputResult_SUCC, details = "updated" });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private void HandleCRM_ScheduleAlert(JsonObject data)
+        {
+            int rID = Convert.ToInt32((data["R_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+
+
+            var _sr = (from _c in _scrme.task_schedule_records
+                       where _c.R_Id == rID && _c.Handle_By == null
+                       select _c).SingleOrDefault<task_schedule_record>();
+
+            // exists in table
+            if (_sr != null)
+            {
+                _sr.Comment = (data["Comment"] ?? "").ToString();
+
+                _sr.Handle_By = agentId;
+                _sr.Handle_Time = DateTime.Now;
+
+                _scrme.SaveChanges();
+            }
+
+        }
+
+
+        // Get Schedule History
+        [Route("GetScheduleHistory")]
+        [HttpPost]
+        public IActionResult GetScheduleHistory([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    string searchtype = (data["Search_Type"] ?? "").ToString();
+
+                    if (searchtype == "1month" || searchtype == "1year")
+                    {
+                        List<task_schedule_record> _list_cont = GetCRM_ScheduleHistory(searchtype);
+
+                        if (_list_cont != null)
+                        {
+                            // return successful get and display the list of data
+                            return Ok(new { result = OutputResult_SUCC, details = _list_cont });
+                        }
+                        else
+                        {
+                            // return unsuccessful get
+                            return Ok(new { result = "fail", details = "does not exist" });
+                        }
+                    }
+                    else
+                    {
+                        // wrong data
+                        return Ok(new { result = "fail", details = "Invalid Parameters." });
+                    }
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private List<task_schedule_record> GetCRM_ScheduleHistory(string stype)
+        {
+            // obtain results
+            IQueryable<task_schedule_record> _sch = from _r in _scrme.task_schedule_records
+                                                              where _r.Handle_By != null
+                                                              select _r;
+
+            if (stype == "1month")
+            {
+               // DateTime s_time = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd HH:00:00")).AddMonths(-1); //old
+                DateTime s_time = DateTime.ParseExact(DateTime.Now.ToString("yyyy-MM-dd HH:00:00"), "yyyy-MM-dd HH:mm:ss", 
+                                                        System.Globalization.CultureInfo.InvariantCulture).AddMonths(-1);
+
+                _sch = _sch.Where(_r => _r.Handle_Time >= s_time);
+            }
+            else if (stype == "1year")
+            {
+               // DateTime s_time = DateTime.Parse(DateTime.Now.ToString("yyyy-MM-dd HH:00:00")).AddMonths(-12); //old
+                DateTime s_time = DateTime.ParseExact(DateTime.Now.ToString("yyyy-MM-dd HH:00:00"), "yyyy-MM-dd HH:mm:ss",
+                                                        System.Globalization.CultureInfo.InvariantCulture).AddMonths(-12);
+
+                _sch = _sch.Where(_r => _r.Handle_Time >= s_time);
+            }
+
+            return _sch.ToList();
+        }
+
+
+
+
+
 
 
     }
