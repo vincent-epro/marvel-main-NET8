@@ -1654,6 +1654,122 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Add Schedule Setting
+        [Route("AddScheduleSetting")]
+        [HttpPost]
+        public IActionResult AddScheduleSetting([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    addCRM_ScheduleSetting(data);
+                    return Ok(new { result = OutputResult_SUCC, details = "inserted" });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private void addCRM_ScheduleSetting(JsonObject data)
+        {
+            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+
+            task_schedule_setting _new_sch_item = new task_schedule_setting();
+
+            _new_sch_item.Service = (data["Service"] ?? "").ToString();
+            _new_sch_item.Display_Message = (data["Display_Message"] ?? "").ToString();
+            _new_sch_item.Schedule_Type = (data["Schedule_Type"] ?? "").ToString();
+            _new_sch_item.Schedule_Time = Convert.ToDateTime((data["Schedule_Time"] ?? "").ToString());
+            _new_sch_item.Status = "Active";
+
+            _new_sch_item.Created_By = agentId;
+            _new_sch_item.Created_Time = DateTime.Now;
+            _new_sch_item.Updated_By = agentId;
+            _new_sch_item.Updated_Time = DateTime.Now;
+
+            _scrme.task_schedule_settings.Add(_new_sch_item);
+
+            _scrme.SaveChanges();
+
+        }
+
+
+        // Update Schedule Setting
+        [Route("UpdateScheduleSetting")]
+        [HttpPut]
+        public IActionResult UpdateScheduleSetting([FromBody] JsonObject data)
+        {
+            string token = (data[InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (Authenticated(token, tk_agentId))
+                {
+                    updateCRM_ScheduleSetting(data);
+                    return Ok(new { result = OutputResult_SUCC, details = "updated" });
+                }
+                else
+                {
+                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = "fail", details = err.Message });
+            }
+        }
+
+        private void updateCRM_ScheduleSetting(JsonObject data)
+        {
+            int sID = Convert.ToInt32((data["S_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            string s_action = (data["S_Action"] ?? "").ToString();
+
+
+            var _ss = (from _c in _scrme.task_schedule_settings
+                       where _c.S_Id == sID && _c.Status == "Active"
+                       select _c).SingleOrDefault<task_schedule_setting>();
+
+            // exists in table
+            if (_ss != null)
+            {
+                if (s_action == "Amend")
+                {
+                    _ss.Service = (data["Service"] ?? "").ToString();
+                    _ss.Display_Message = (data["Display_Message"] ?? "").ToString();
+                    _ss.Schedule_Type = (data["Schedule_Type"] ?? "").ToString();
+                    _ss.Schedule_Time = Convert.ToDateTime((data["Schedule_Time"] ?? "").ToString());
+
+                    _ss.Updated_By = agentId;
+                    _ss.Updated_Time = DateTime.Now;
+
+                    _scrme.SaveChanges();
+                }
+                else if (s_action == "Delete")
+                {
+                    _ss.Status = "InActive";
+
+                    _ss.Updated_By = agentId;
+                    _ss.Updated_Time = DateTime.Now;
+
+                    _scrme.SaveChanges();
+                }
+
+            }
+
+        }
+
 
 
 
