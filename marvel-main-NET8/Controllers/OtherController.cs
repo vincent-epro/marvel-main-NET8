@@ -130,7 +130,7 @@ namespace marvel_main_NET8.Controllers
 
                     // declare a temp json object to store each agent item
                     JObject agentObj = new JObject();
-                    agentObj.RemoveAll(); // clear the object
+                  //  agentObj.RemoveAll(); // clear the object
 
                     // iterate each column of the _agent_item
                     foreach (PropertyInfo property in _agent.GetType().GetProperties())
@@ -684,7 +684,7 @@ namespace marvel_main_NET8.Controllers
             {
                 // declare a temp json object to store each column of data
                 JObject tempJson = new JObject();
-                tempJson.RemoveAll(); // clear the temp object
+              //  tempJson.RemoveAll(); // clear the temp object
 
                 // iterate through each column 
                 foreach (PropertyInfo property in _role_item.GetType().GetProperties())
@@ -949,7 +949,7 @@ namespace marvel_main_NET8.Controllers
                 // declare a temp json object to store each column of data
                 JObject tempJson = new JObject();
 
-                tempJson.RemoveAll(); // clear the temp object
+             //   tempJson.RemoveAll(); // clear the temp object
 
                 // iterate through each column of the _agent_item
                 foreach (PropertyInfo property in _agent_item._agent.GetType().GetProperties())
@@ -1175,7 +1175,7 @@ namespace marvel_main_NET8.Controllers
                 {
                     // declare a temp json object to store each 
                     JObject tempJson = new JObject();
-                    tempJson.RemoveAll(); // clear the object
+                  //  tempJson.RemoveAll(); // clear the object
 
                     // iterate each column 
                     foreach (PropertyInfo property in _item.GetType().GetProperties())
