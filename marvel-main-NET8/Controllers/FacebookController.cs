@@ -114,13 +114,13 @@ namespace marvel_main_NET8.Controllers
 
             if (_posts.Count() > 0)
             {
-                // iterate through each row of data in agentInfo
+                // iterate through each row of data
                 foreach (facebook_post _post_item in _posts)
                 {
                     // declare a temp json object to store each column of data
                     JObject tempJson = new JObject();
 
-                    tempJson.RemoveAll(); // clear the temp object
+                  //  tempJson.RemoveAll(); // clear the temp object
 
                     // iterate each column of _post_content
                     foreach (PropertyInfo property in _post_item.GetType().GetProperties())
