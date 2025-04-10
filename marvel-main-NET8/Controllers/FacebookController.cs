@@ -161,6 +161,69 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Create FacebookPost Content
+        [Route("CreateFacebookPostContent")]
+        [HttpPost]
+        public IActionResult CreateFacebookPostContent([FromBody] JsonObject data)
+        {
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (ValidateClass.Authenticated(token, tk_agentId))
+                {
+                    List<facebook_post> _new_post = CreateCRM_FacebookPostContent(data);
+
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = _new_post });
+                }
+                else
+                {
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
+            }
+        }
+
+        private List<facebook_post> CreateCRM_FacebookPostContent(JsonObject data)
+        {
+            // declare db table items
+            facebook_post _post_item = new facebook_post();
+
+            int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            string details = (data["Details"] ?? "").ToString();
+
+            // assign new record
+            _post_item.Ticket_Id = ticketId;
+            _post_item.Created_By = agentId;
+            _post_item.Created_Time = DateTime.Now;
+            _post_item.Updated_By = agentId;
+            _post_item.Updated_Time = DateTime.Now;
+            _post_item.Details = details;
+
+            // add new record
+            _scrme.facebook_posts.Add(_post_item);
+
+            // save db changes
+            _scrme.SaveChanges();
+
+
+            // obtain the new from table "facebook_post"
+            List<facebook_post> _new_post = (from _f in _scrme.facebook_posts
+                                                       where _f.Fb_Id == _post_item.Fb_Id
+                                                       select _f).ToList();
+
+
+            return _new_post;
+        }
+
+
+
+
 
 
     }
