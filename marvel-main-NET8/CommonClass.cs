@@ -13,6 +13,7 @@ namespace marvel_main_NET8
     public static class AppOutp
     {
         public const string OutputResult_SUCC = "success";
+        public const string OutputResult_FAIL = "fail";
 
         public const string Not_Auth_Desc = "Not Auth.";
 

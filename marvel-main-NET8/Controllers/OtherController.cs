@@ -76,7 +76,7 @@ namespace marvel_main_NET8.Controllers
             }
             catch (Exception )
             {
-                return Ok(new { result = "fail", details = "Invalid Parameters" });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = "Invalid Parameters" });
 
             }
         }
@@ -282,7 +282,7 @@ namespace marvel_main_NET8.Controllers
                 {
                     allJsonResults = new JObject()
                     {
-                        new JProperty("result", "fail"),
+                        new JProperty("result", AppOutp.OutputResult_FAIL),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
                         new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
@@ -292,7 +292,7 @@ namespace marvel_main_NET8.Controllers
                 {
                     allJsonResults = new JObject()
                     {
-                        new JProperty("result", "fail"),
+                        new JProperty("result", AppOutp.OutputResult_FAIL),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
                         new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
@@ -305,7 +305,7 @@ namespace marvel_main_NET8.Controllers
 
                     allJsonResults = new JObject()
                     {
-                        new JProperty("result", "fail"),
+                        new JProperty("result", AppOutp.OutputResult_FAIL),
                         new JProperty("details", details)
                     };
                 }
@@ -334,13 +334,13 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
 
             }
             catch (Exception )
             {
-                return Ok(new { result = "fail", details = "cannot create user." });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = "cannot create user." });
 
             }
         }
@@ -449,12 +449,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -564,13 +564,13 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
 
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -610,12 +610,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -655,13 +655,13 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
 
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
 
             }
         }
@@ -722,12 +722,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {               
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -775,13 +775,13 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
 
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
 
             }
         }
@@ -839,12 +839,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -909,13 +909,13 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
 
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
 
             }
         }
@@ -1006,12 +1006,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception)
             {
-                return Ok(new { result = "fail", details = "cannot change password" });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = "cannot change password" });
             }
         }
 
@@ -1126,13 +1126,13 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
 
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
 
             }
         }
@@ -1225,12 +1225,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1277,12 +1277,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1328,7 +1328,7 @@ namespace marvel_main_NET8.Controllers
 
                 if (Request.Form.Files.Count == 0)
                 {
-                    return Ok(new { result = "fail", details = "No file was uploaded." });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = "No file was uploaded." });
                 }
                 var file = Request.Form.Files[0];
 
@@ -1370,19 +1370,19 @@ namespace marvel_main_NET8.Controllers
                         }
                         else
                         {
-                            return Ok(new { result = "fail", details = "No such record." });
+                            return Ok(new { result = AppOutp.OutputResult_FAIL, details = "No such record." });
                         }
                     }
 
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1431,13 +1431,13 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
 
             }
             catch (Exception)
             {
-                return Ok(new { result = "fail", details = "invalid parameters" });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = "invalid parameters" });
             }
         }
 
@@ -1536,18 +1536,18 @@ namespace marvel_main_NET8.Controllers
                     else
                     {
                         // return unsuccessful get
-                        return Ok(new { result = "fail", details = "does not exist" });
+                        return Ok(new { result = AppOutp.OutputResult_FAIL, details = "does not exist" });
                     }
 
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1579,12 +1579,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1629,12 +1629,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1701,18 +1701,18 @@ namespace marvel_main_NET8.Controllers
                     else
                     {
                         // return unsuccessful get
-                        return Ok(new { result = "fail", details = "does not exist" });
+                        return Ok(new { result = AppOutp.OutputResult_FAIL, details = "does not exist" });
                     }
 
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1744,12 +1744,12 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
@@ -1803,23 +1803,23 @@ namespace marvel_main_NET8.Controllers
                         else
                         {
                             // return unsuccessful get
-                            return Ok(new { result = "fail", details = "does not exist" });
+                            return Ok(new { result = AppOutp.OutputResult_FAIL, details = "does not exist" });
                         }
                     }
                     else
                     {
                         // wrong data
-                        return Ok(new { result = "fail", details = "Invalid Parameters." });
+                        return Ok(new { result = AppOutp.OutputResult_FAIL, details = "Invalid Parameters." });
                     }
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
             {
-                return Ok(new { result = "fail", details = err.Message });
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
             }
         }
 
