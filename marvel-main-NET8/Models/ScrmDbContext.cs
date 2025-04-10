@@ -19,6 +19,8 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<config> configs { get; set; }
 
+    public virtual DbSet<facebook_post> facebook_posts { get; set; }
+
     public virtual DbSet<field> fields { get; set; }
 
     public virtual DbSet<field_option> field_options { get; set; }
@@ -33,6 +35,9 @@ public partial class ScrmDbContext : DbContext
 
     public virtual DbSet<user_role> user_roles { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=172.17.7.40;Database=scrm;Integrated Security=false;User ID=sa;Password=+Epro_Demo+;TrustServerCertificate=true;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,6 +79,19 @@ public partial class ScrmDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.P_Value).HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<facebook_post>(entity =>
+        {
+            entity.HasKey(e => e.Ticket_Id).HasName("PK_FaceBookPost");
+
+            entity.ToTable("facebook_post");
+
+            entity.Property(e => e.Ticket_Id).ValueGeneratedNever();
+            entity.Property(e => e.Created_Time).HasColumnType("datetime");
+            entity.Property(e => e.Fb_Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Media_Type).HasMaxLength(100);
+            entity.Property(e => e.Updated_Time).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<field>(entity =>
