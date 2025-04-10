@@ -4,6 +4,21 @@ using System.Security.Claims;
 
 namespace marvel_main_NET8
 {
+    public static class AppInp
+    {
+        public const string InputAuth_Agent_Id = "Agent_Id";
+        public const string InputAuth_Token = "Token";
+    }
+
+    public static class AppOutp
+    {
+        public const string OutputResult_SUCC = "success";
+
+        public const string Not_Auth_Desc = "Not Auth.";
+
+    }
+
+
     public static class ValidateClass
     {
         // JWT

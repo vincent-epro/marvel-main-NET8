@@ -64,17 +64,6 @@ namespace marvel_main_NET8.Controllers
         }
 
 
-        public const string OutputResult_SUCC = "success";
-
-        public const string Not_Auth_Desc = "Not Auth.";
-
-        public const string InputAuth_Agent_Id = "Agent_Id";
-        public const string InputAuth_Token = "Token";
-
-
-
-
-
         // Login
         [Route("Login")]
         [HttpPost]
@@ -184,7 +173,7 @@ namespace marvel_main_NET8.Controllers
                         agentObj.Add(new JProperty("Functions", _role.Functions));
                     }
 
-                    agentObj.Add(new JProperty(InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(_agent.AgentID))));
+                    agentObj.Add(new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(_agent.AgentID))));
 
 
                     // obtain all data from table config
@@ -231,7 +220,7 @@ namespace marvel_main_NET8.Controllers
 
                     allJsonResults = new JObject()
                     {
-                        new JProperty("result", OutputResult_SUCC),
+                        new JProperty("result", AppOutp.OutputResult_SUCC),
                         new JProperty("details", agentObj)
                     };
 
@@ -296,7 +285,7 @@ namespace marvel_main_NET8.Controllers
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
-                        new JProperty(InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
+                        new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else if (details == "Account has expired.")
@@ -306,7 +295,7 @@ namespace marvel_main_NET8.Controllers
                         new JProperty("result", "fail"),
                         new JProperty("details", details),
                         new JProperty("AgentID", existing_agentid),
-                        new JProperty(InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
+                        new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
                     };
                 }
                 else
@@ -334,18 +323,18 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CreateUser([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    return Ok(new { result = OutputResult_SUCC, details = CreateCRMUser(data) });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = CreateCRMUser(data) });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
 
             }
@@ -448,19 +437,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPut]
         public IActionResult UpdateUser([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     UpdateCRMUser(data);
-                    return Ok(new { result = OutputResult_SUCC, details = "updated user" });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated user" });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -563,8 +552,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CheckAgentId([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -575,7 +564,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
 
             }
@@ -609,8 +598,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CheckSellerId([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -621,7 +610,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -655,8 +644,8 @@ namespace marvel_main_NET8.Controllers
         public IActionResult GetRoles([FromBody] JsonObject data)
         {
             string status = (data["RoleStatus"] ?? "").ToString();
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -666,7 +655,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
 
             }
@@ -708,7 +697,7 @@ namespace marvel_main_NET8.Controllers
 
             JObject rolesJson = new JObject() // add to overall json object
                     {
-                        new JProperty("result", OutputResult_SUCC),
+                        new JProperty("result", AppOutp.OutputResult_SUCC),
                         new JProperty("details", roleListJason)
                     };
 
@@ -721,19 +710,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetAgentsOfRole([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     string agentsOfRole = GetAgentlistByRole(data);
-                    return Ok(new { result = OutputResult_SUCC, details = agentsOfRole });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = agentsOfRole });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -775,18 +764,18 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CreateRole([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    return Ok(new { result = OutputResult_SUCC, details = CreateCRMRole(data) });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = CreateCRMRole(data) });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
 
             }
@@ -838,19 +827,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPut]
         public IActionResult UpdateRole([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     UpdateCRMRole(data);
-                    return Ok(new { result = OutputResult_SUCC, details = "updated user role" });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated user role" });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -909,8 +898,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetLogin([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -920,7 +909,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
 
             }
@@ -991,7 +980,7 @@ namespace marvel_main_NET8.Controllers
             // set up _all_results json data
             JObject allJsonResults = new JObject()
             {
-                new JProperty("result", OutputResult_SUCC),
+                new JProperty("result", AppOutp.OutputResult_SUCC),
                 new JProperty("details", _agent_list)
             };
 
@@ -1005,19 +994,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPut]
         public IActionResult ChangePassword([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     string changeResult = ChangeUserPassword(data);
-                    return Ok(new { result = OutputResult_SUCC, details = changeResult });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = changeResult });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception)
@@ -1123,8 +1112,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetFloorPlan([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             string ftype = (data["F_Type"] ?? "").ToString();
             int fid = Convert.ToInt32((data["F_Id"] ?? "-1").ToString());
@@ -1137,7 +1126,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
 
             }
@@ -1201,7 +1190,7 @@ namespace marvel_main_NET8.Controllers
                 // add the log list to jobject
                 allJsonResults = new JObject()
                 {
-                     new JProperty("result", OutputResult_SUCC),
+                     new JProperty("result", AppOutp.OutputResult_SUCC),
                      new JProperty("details", jsonList)
                 };
 
@@ -1210,7 +1199,7 @@ namespace marvel_main_NET8.Controllers
             {
                 allJsonResults = new JObject()
                 {
-                     new JProperty("result", OutputResult_SUCC),
+                     new JProperty("result", AppOutp.OutputResult_SUCC),
                      new JProperty("details", jsonList)
                 };
             }
@@ -1224,19 +1213,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult AddFloorPlan([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     addCRM_FloorPlan(data);
-                    return Ok(new { result = OutputResult_SUCC, details = "inserted" });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "inserted" });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1276,19 +1265,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPut]
         public IActionResult UpdateFloorPlan([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     updateCRM_FloorPlan(data);
-                    return Ok(new { result = OutputResult_SUCC, details = "updated" });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated" });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1377,7 +1366,7 @@ namespace marvel_main_NET8.Controllers
 
                         if (saveStatus == "success")
                         {
-                            return Ok(new { result = OutputResult_SUCC, details = "" });
+                            return Ok(new { result = AppOutp.OutputResult_SUCC, details = "" });
                         }
                         else
                         {
@@ -1388,7 +1377,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1423,8 +1412,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetFields([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -1438,11 +1427,11 @@ namespace marvel_main_NET8.Controllers
                     Dictionary<string, List<FieldDetails>>  tableFields = GetCRM_Fields(data);
 
 
-                    return Ok(new { result = OutputResult_SUCC, details = tableFields });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = tableFields });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
 
             }
@@ -1530,8 +1519,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetScheduleSetting([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -1542,7 +1531,7 @@ namespace marvel_main_NET8.Controllers
                     if (_list_cont != null)
                     {
                         // return successful get and display the list of data
-                        return Ok(new { result = OutputResult_SUCC, details = _list_cont });
+                        return Ok(new { result = AppOutp.OutputResult_SUCC, details = _list_cont });
                     }
                     else
                     {
@@ -1553,7 +1542,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1578,19 +1567,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult AddScheduleSetting([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     addCRM_ScheduleSetting(data);
-                    return Ok(new { result = OutputResult_SUCC, details = "inserted" });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "inserted" });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1628,19 +1617,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPut]
         public IActionResult UpdateScheduleSetting([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     updateCRM_ScheduleSetting(data);
-                    return Ok(new { result = OutputResult_SUCC, details = "updated" });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated" });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1695,8 +1684,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult CheckScheduleAlert([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -1707,7 +1696,7 @@ namespace marvel_main_NET8.Controllers
                     if (_list_cont != null)
                     {
                         // return successful get and display the list of data
-                        return Ok(new { result = OutputResult_SUCC, details = _list_cont });
+                        return Ok(new { result = AppOutp.OutputResult_SUCC, details = _list_cont });
                     }
                     else
                     {
@@ -1718,7 +1707,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1743,19 +1732,19 @@ namespace marvel_main_NET8.Controllers
         [HttpPut]
         public IActionResult HandleScheduleAlert([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
                     HandleCRM_ScheduleAlert(data);
-                    return Ok(new { result = OutputResult_SUCC, details = "updated" });
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated" });
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
@@ -1793,8 +1782,8 @@ namespace marvel_main_NET8.Controllers
         [HttpPost]
         public IActionResult GetScheduleHistory([FromBody] JsonObject data)
         {
-            string token = (data[InputAuth_Token] ?? "").ToString();
-            string tk_agentId = (data[InputAuth_Agent_Id] ?? "").ToString();
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
 
             try
             {
@@ -1809,7 +1798,7 @@ namespace marvel_main_NET8.Controllers
                         if (_list_cont != null)
                         {
                             // return successful get and display the list of data
-                            return Ok(new { result = OutputResult_SUCC, details = _list_cont });
+                            return Ok(new { result = AppOutp.OutputResult_SUCC, details = _list_cont });
                         }
                         else
                         {
@@ -1825,7 +1814,7 @@ namespace marvel_main_NET8.Controllers
                 }
                 else
                 {
-                    return Ok(new { result = "fail", details = Not_Auth_Desc });
+                    return Ok(new { result = "fail", details = AppOutp.Not_Auth_Desc });
                 }
             }
             catch (Exception err)
