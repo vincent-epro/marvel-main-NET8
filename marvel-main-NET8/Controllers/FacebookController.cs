@@ -1,6 +1,9 @@
 ﻿using marvel_main_NET8.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using System.Reflection;
+using System.Text;
 using System.Text.Json.Nodes;
 
 namespace marvel_main_NET8.Controllers
@@ -65,6 +68,97 @@ namespace marvel_main_NET8.Controllers
             return exists;
         }
 
+
+        // Get FaceBookPost Content
+        [Route("GetFaceBookPostContent")]
+        [HttpPost]
+        public IActionResult GetFaceBookPostContent([FromBody] JsonObject data)
+        {
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (ValidateClass.Authenticated(token, tk_agentId))
+                {
+
+                    int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
+
+
+                    return Content(GetCRM_FacebookPostContent(ticketId).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                }
+                else
+                {
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
+                }
+
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
+
+            }
+        }
+
+        private JObject GetCRM_FacebookPostContent(int ticketId)
+        {
+            // declare a json object to contain the details of the data
+            List<JObject> detailsJson = new List<JObject>();
+
+            IQueryable<facebook_post> _posts = (from _p in _scrme.facebook_posts select _p);
+
+            if (ticketId != -1)
+            {
+                _posts = _posts.Where(_p => _p.Ticket_Id == ticketId);
+            }
+
+            if (_posts.Count() > 0)
+            {
+                // iterate through each row of data in agentInfo
+                foreach (facebook_post _post_item in _posts)
+                {
+                    // declare a temp json object to store each column of data
+                    JObject tempJson = new JObject();
+
+                    tempJson.RemoveAll(); // clear the temp object
+
+                    // iterate each column of _post_content
+                    foreach (PropertyInfo property in _post_item.GetType().GetProperties())
+                    {
+                        switch (property.Name)
+                        {
+                            case "Fb_Id":
+                            case "Ticket_Id":
+                            case "Details":
+                            case "Media_Type":
+                            case "Media_Link":
+                                {
+                                    tempJson.Add(new JProperty(property.Name, property.GetValue(_post_item)));
+                                }
+                                break;
+                            default:
+                                // For others, skip
+                                break;
+                        }
+                    }
+                    detailsJson.Add(tempJson); // add the temp result to the list
+                }
+
+
+            }
+
+
+            // include the list in the JSON object of the final result
+            JObject jsonResults = new JObject()
+            {
+                new JProperty("result", AppOutp.OutputResult_SUCC),
+                new JProperty("details", detailsJson)
+            };
+
+            // return all results in json format
+            return jsonResults;
+
+        }
 
 
 
