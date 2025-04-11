@@ -1220,7 +1220,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    addCRM_FloorPlan(data);
+                    AddCRM_FloorPlan(data);
                     return Ok(new { result = AppOutp.OutputResult_SUCC, details = "inserted" });
                 }
                 else
@@ -1234,7 +1234,7 @@ namespace marvel_main_NET8.Controllers
             }
         }
 
-        private void addCRM_FloorPlan(JsonObject data)
+        private void AddCRM_FloorPlan(JsonObject data)
         {
             int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
 
@@ -1272,7 +1272,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    updateCRM_FloorPlan(data);
+                    UpdateCRM_FloorPlan(data);
                     return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated" });
                 }
                 else
@@ -1286,7 +1286,7 @@ namespace marvel_main_NET8.Controllers
             }
         }
 
-        private void updateCRM_FloorPlan([FromBody] dynamic data)
+        private void UpdateCRM_FloorPlan([FromBody] dynamic data)
         {
             int fID = Convert.ToInt32((data["F_Id"] ?? "-1").ToString());
             int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
@@ -1574,7 +1574,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    addCRM_ScheduleSetting(data);
+                    AddCRM_ScheduleSetting(data);
                     return Ok(new { result = AppOutp.OutputResult_SUCC, details = "inserted" });
                 }
                 else
@@ -1588,7 +1588,7 @@ namespace marvel_main_NET8.Controllers
             }
         }
 
-        private void addCRM_ScheduleSetting(JsonObject data)
+        private void AddCRM_ScheduleSetting(JsonObject data)
         {
             int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
 
@@ -1624,7 +1624,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    updateCRM_ScheduleSetting(data);
+                    UpdateCRM_ScheduleSetting(data);
                     return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated" });
                 }
                 else
@@ -1638,7 +1638,7 @@ namespace marvel_main_NET8.Controllers
             }
         }
 
-        private void updateCRM_ScheduleSetting(JsonObject data)
+        private void UpdateCRM_ScheduleSetting(JsonObject data)
         {
             int sID = Convert.ToInt32((data["S_Id"] ?? "-1").ToString());
             int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
