@@ -15,8 +15,12 @@ namespace marvel_main_NET8.Controllers
     {
         private readonly ScrmDbContext _scrme;
 
-        public FacebookController(ScrmDbContext context)
+        private readonly string rootPath;
+
+        public FacebookController(IConfiguration iConfig, ScrmDbContext context)
         {
+            rootPath = iConfig.GetValue<string>("Facebook_Media_path") ?? "";
+
             _scrme = context;
         }
 
@@ -314,8 +318,114 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Upload Facebook Media
+        [Route("UploadFacebookMedia")]
+        [HttpPost]
+        public IActionResult UploadFacebookMedia()
+        {
+            try
+            {
+                string token = string.Empty;
+                string tk_agentId = string.Empty;
+
+                int ticketId = 0;
+                int agentId = 0;
+
+                if (Request.Form.Files.Count == 0)
+                {
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = "No file was uploaded." });
+                }
+                var file = Request.Form.Files[0];
+
+                foreach (var key in Request.Form.Keys)
+                {
+                    if (key == "Ticket_Id")
+                    {
+                        ticketId = Convert.ToInt32(Request.Form[key]);
+                    }
+                    else if (key == "Agent_Id")
+                    {
+                        agentId = Convert.ToInt32(Request.Form[key]);
+
+                        tk_agentId = Convert.ToString(Request.Form[key]);
+                    }
+                    else if (key == "Token")
+                    {
+                        // token = Request.Form[key]; //old
+                        token = Convert.ToString(Request.Form[key]) ?? string.Empty;
+
+                    }
+                }
 
 
+                if (ValidateClass.Authenticated(token, tk_agentId))
+                {
+                    if (ticketId == 0) // cannot obtain ticket id
+                    {
+                        return Ok(new { result = AppOutp.OutputResult_FAIL, details = "Invalid Parameters." });
+                    }
+                    else
+                    {
+
+                        string mediaType = file.ContentType;
+
+                        // extract only the filename
+                        string fileName = Path.GetFileName(file.FileName);
+
+                        // decide the whole file path
+                        string filePath = Path.Combine(rootPath, fileName);
+                        
+                        // Save the file to the server
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            file.CopyTo(stream);
+                        }
+
+                        string mediaLink = ".\\fb_media\\" + fileName;
+
+                        SaveCRM_FbMedia(ticketId, agentId, mediaType, mediaLink);
+
+                        return Ok(new
+                        {
+                            result = AppOutp.OutputResult_SUCC,
+                            details = new
+                            {
+                                Media_Type = mediaType,
+                                Media_Link = mediaLink
+                            }
+                        });
+
+                    }
+
+                }
+                else
+                {
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
+            }
+        }
+
+        private void SaveCRM_FbMedia(int ticketId, int agentId, string mediaType, string mediaLink)
+        {
+            // obtain the row of data with the given ticket id
+            facebook_post? _post = (from _f in _scrme.facebook_posts
+                                             where _f.Ticket_Id == ticketId
+                                             select _f).SingleOrDefault();
+
+            if (_post != null)
+            {
+                // assign the parameters to db columns
+                _post.Media_Type = mediaType;
+                _post.Media_Link = mediaLink;
+                _post.Updated_By = agentId;
+                _post.Updated_Time = DateTime.Now;
+                _scrme.SaveChanges(); // save to database
+            }
+        }
 
 
 
