@@ -222,6 +222,99 @@ namespace marvel_main_NET8.Controllers
         }
 
 
+        // Update FacebookPost Content
+        [Route("UpdateFacebookPostContent")]
+        [HttpPut]
+        public IActionResult UpdateFacebookPostContent([FromBody] JsonObject data)
+        {
+            string token = (data[AppInp.InputAuth_Token] ?? "").ToString();
+            string tk_agentId = (data[AppInp.InputAuth_Agent_Id] ?? "").ToString();
+
+            try
+            {
+                if (ValidateClass.Authenticated(token, tk_agentId))
+                {
+                    UpdateCRM_FacebookPostContent(data);
+                    return Ok(new { result = AppOutp.OutputResult_SUCC, details = "updated facebook post" });
+                }
+                else
+                {
+                    return Ok(new { result = AppOutp.OutputResult_FAIL, details = AppOutp.Not_Auth_Desc });
+                }
+            }
+            catch (Exception err)
+            {
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = err.Message });
+            }
+        }
+
+        private void UpdateCRM_FacebookPostContent(JsonObject data)
+        {
+            int fbId = Convert.ToInt32((data["Fb_Id"] ?? "-1").ToString());
+            int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+
+            string details = (data["Details"] ?? "").ToString();
+            string mediaRemoved = (data["Media_Removed"] ?? "N").ToString();
+
+
+            // obtain single post record based on the fb id
+            facebook_post? _post_item = (from _f in _scrme.facebook_posts
+                                                  where _f.Fb_Id == fbId
+                                                  select _f).SingleOrDefault<facebook_post>();
+
+            // if there is at least 1 post
+            if (_post_item != null)
+            {
+                // decide if it's update with ticket id or update w/o ticket id
+                if (_post_item.Ticket_Id == ticketId)
+                {
+                    // assign the updated values to the row
+                    _post_item.Updated_By = agentId;
+                    _post_item.Updated_Time = DateTime.Now;
+                    _post_item.Details = details;
+
+                    if (mediaRemoved == "Y")
+                    {
+                        _post_item.Media_Type = string.Empty;
+                        _post_item.Media_Link = string.Empty;
+                    }
+
+                }
+                else
+                {
+                    // add a new row using the data above
+                    // declare db table items
+                    facebook_post _new_post_item = new facebook_post();
+
+                    // assign new post record
+                    _new_post_item.Ticket_Id = ticketId;
+                    _new_post_item.Created_By = _post_item.Created_By;
+                    _new_post_item.Created_Time = _post_item.Created_Time;
+                    _new_post_item.Updated_By = agentId;
+                    _new_post_item.Updated_Time = DateTime.Now;
+                    _new_post_item.Details = details;
+                    _new_post_item.Media_Link = _post_item.Media_Link;
+                    _new_post_item.Media_Type = _post_item.Media_Type;
+
+                    if (mediaRemoved == "Y")
+                    {
+                        _new_post_item.Media_Link = string.Empty;
+                        _new_post_item.Media_Type = string.Empty;
+                    }
+
+                    // delete the old row
+                    _scrme.facebook_posts.Remove(_post_item);
+
+                    // add the new row
+                    _scrme.facebook_posts.Add(_new_post_item);
+                }
+                _scrme.SaveChanges(); // save changes to db
+            }
+        }
+
+
+
 
 
 

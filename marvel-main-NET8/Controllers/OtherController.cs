@@ -361,7 +361,7 @@ namespace marvel_main_NET8.Controllers
             int levelId = GetLevelId(role); // get level Id using the role name
 
             string accountStatus = (data["Account_status"] ?? "").ToString();
-            string photoRemoved = (data["Photo_Removed"] ?? "").ToString();
+            string photoRemoved = (data["Photo_Removed"] ?? "N").ToString();
 
             // assign new agent record
             _agent_item.AgentID = agentId;
@@ -473,7 +473,7 @@ namespace marvel_main_NET8.Controllers
             int levelId = GetLevelId(role); // get level Id using the role name
 
             string accountStatus = (data["Account_status"] ?? "").ToString();
-            string photoRemoved = (data["Photo_Removed"] ?? "").ToString();
+            string photoRemoved = (data["Photo_Removed"] ?? "N").ToString();
 
             int counter = Convert.ToInt32((data["Counter"] ?? "-1").ToString());
 
