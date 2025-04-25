@@ -1493,9 +1493,9 @@ namespace marvel_main_NET8.Controllers
                         // declare and initialize FieldDetails class object with required arguments
                         FieldDetails _fd = new FieldDetails(
                             _field_item.Field_Name,
-                            _field_item.Field_Display ?? string.Empty,
-                            _field_item.Field_Tag ?? string.Empty,
-                            _field_item.Field_Type ?? string.Empty,
+                            _field_item.Field_Display,
+                            _field_item.Field_Tag,
+                            _field_item.Field_Type,
                             temp
                         );
 
