@@ -1,6 +1,7 @@
 
 using marvel_main_NET8.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace marvel_main_NET8
 {
@@ -38,6 +39,15 @@ namespace marvel_main_NET8
                 //   UseSwagger
 
             }
+
+            app.UseCors(policy =>
+            {
+                policy.AllowAnyOrigin() // Temporarily allow all origins
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+
+
 
             app.UseAuthorization();
 

@@ -76,8 +76,7 @@ namespace marvel_main_NET8.Controllers
             }
             catch (Exception )
             {
-                return Ok(new { result = AppOutp.OutputResult_FAIL, details = "Invalid Parameters" });
-
+                return Ok(new { result = AppOutp.OutputResult_FAIL, details = "Invalid Parameters" });                
             }
         }
 
