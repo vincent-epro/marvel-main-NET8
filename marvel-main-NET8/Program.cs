@@ -42,9 +42,17 @@ namespace marvel_main_NET8
 
             app.UseCors(policy =>
             {
-                policy.AllowAnyOrigin() // Temporarily allow all origins
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
+                policy.SetIsOriginAllowed(origin =>
+                {
+                    var host = new Uri(origin).Host;
+                    var ipAddresses = Dns.GetHostAddresses(host);
+                    return ipAddresses.Any(s => s.ToString().StartsWith("172.17."));
+
+                })
+                //policy.AllowAnyOrigin()
+                //policy.WithOrigins("http://172.17.*.*")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
             });
 
 
