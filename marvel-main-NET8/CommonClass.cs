@@ -17,6 +17,8 @@ namespace marvel_main_NET8
 
         public const string Not_Auth_Desc = "Not Auth.";
 
+        public const string Output_Json_Charset = "application/json; charset=utf-8";
+
     }
 
 

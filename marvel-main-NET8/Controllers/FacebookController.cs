@@ -89,7 +89,7 @@ namespace marvel_main_NET8.Controllers
                     int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
 
 
-                    return Content(GetCRM_FacebookPostContent(ticketId).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                    return Content(GetCRM_FacebookPostContent(ticketId).ToString(), AppOutp.Output_Json_Charset, Encoding.UTF8);
                 }
                 else
                 {

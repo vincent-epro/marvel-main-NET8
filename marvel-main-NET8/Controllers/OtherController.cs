@@ -72,7 +72,7 @@ namespace marvel_main_NET8.Controllers
 
             try
             {
-                return Content(Logincrm(data).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                return Content(Logincrm(data).ToString(), AppOutp.Output_Json_Charset, Encoding.UTF8);
             }
             catch (Exception )
             {
@@ -650,7 +650,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    return Content(GetRoleinfo(status).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                    return Content(GetRoleinfo(status).ToString(), AppOutp.Output_Json_Charset, Encoding.UTF8);
                 }
                 else
                 {
@@ -904,7 +904,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    return Content(GetLoginInfo().ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                    return Content(GetLoginInfo().ToString(), AppOutp.Output_Json_Charset, Encoding.UTF8);
                 }
                 else
                 {
@@ -1121,7 +1121,7 @@ namespace marvel_main_NET8.Controllers
             {
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
-                    return Content(GetCRM_FloorPlan(ftype, fid).ToString(), "application/json; charset=utf-8", Encoding.UTF8);
+                    return Content(GetCRM_FloorPlan(ftype, fid).ToString(), AppOutp.Output_Json_Charset, Encoding.UTF8);
                 }
                 else
                 {
