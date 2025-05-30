@@ -82,239 +82,114 @@ namespace marvel_main_NET8.Controllers
 
         private JObject Logincrm(JsonObject data)
         {
-            // obtain form body values                        
             string sellerId = (data["SellerID"] ?? "").ToString();
             string password = (data["Password"] ?? "").ToString();
 
-
-            bool canLogin = false;
-            string details = string.Empty;
-
-            // obtain all data from table agentInfo
-            IQueryable<agentinfo> _agent_details = (from _a in _scrme.agentinfos
-                                                    select _a);
-
-            // declare an agent and temp agent record
-            agentinfo? _agent = null;
-            agentinfo? _agent_temp = null;
-
-            int existing_agentid = 0;
-
-            // use seller id to log in
-            if (sellerId != string.Empty)
+            if (string.IsNullOrEmpty(sellerId))
             {
-                // obtain the single record with the seller id and password
-                _agent = _agent_details.Where(_a => _a.SellerID == sellerId && _a.Password == password).SingleOrDefault<agentinfo>();
-
-                // obtain the single record with the seller id
-                _agent_temp = _agent_details.Where(_a => _a.SellerID == sellerId).SingleOrDefault<agentinfo>();
+                return CreateErrorResponse("Invalid login.", 0);
             }
 
+            var agent = _scrme.agentinfos.FirstOrDefault(_a => _a.SellerID == sellerId && _a.Password == password);
+            var tempAgent = _scrme.agentinfos.FirstOrDefault(_a => _a.SellerID == sellerId);
 
-            // declare a json object to contain all rows of data
-            JObject allJsonResults = new JObject();
-
-            //both id and password are correct
-            if (_agent != null)
+            if (agent == null)
             {
-                // the account status is also active and the login attempt is <= 3
-                if (_agent.Account_status == "Active" && _agent.Counter < 3 && _agent.ExpiryDate > DateTime.Today && _agent.LastLoginDate != null)
+                if (tempAgent != null)
                 {
-                    canLogin = true; //can login
-                    _agent.Counter = 0; // reset counter
-                    _agent.LastLoginDate = DateTime.Now; // update LastLoginDate
-
-                    // update status and save changes in db
-                    _scrme.SaveChanges();
-
-                    // declare a temp json object to store each agent item
-                    JObject agentObj = new JObject();
-                  //  agentObj.RemoveAll(); // clear the object
-
-                    // iterate each column of the _agent_item
-                    foreach (PropertyInfo property in _agent.GetType().GetProperties())
+                    if (tempAgent.Counter < 3)
                     {
-                        // add all column names and values to temp, except "Password"
-                        switch (property.Name)
-                        {
-                            case "Password":
-                            case "Photo":
-                            case "Photo_Type":
-                                {
-                                    break;
-                                }
-                            default:
-                                // add the column name and value to temp
-                                agentObj.Add(new JProperty(property.Name, property.GetValue(_agent)));
-                                break;
-                        }
+                        tempAgent.Counter += 1;
+                        _scrme.SaveChanges();
                     }
-
-                    int? roleId = _agent.LevelID; // obtain the role id from agent_info
-
-                    // use the role id to find the corresponding role name and companies
-                    var _role = (from _r in _scrme.user_roles
-                                 where _r.RoleID == roleId
-                                 select new
-                                 {
-                                     _r.RoleName,
-                                     _r.Companies,
-                                     _r.Categories,
-                                     _r.Functions
-                                 }).SingleOrDefault();
-
-                    if (_role != null)
-                    {
-                        // add role name and companies to _agentObj
-                        agentObj.Add(new JProperty("RoleName", _role.RoleName));
-                        agentObj.Add(new JProperty("Companies", _role.Companies));
-                        agentObj.Add(new JProperty("Categories", _role.Categories));
-                        agentObj.Add(new JProperty("Functions", _role.Functions));
-                    }
-
-                    agentObj.Add(new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(_agent.AgentID))));
-
-
-                    // obtain all data from table config
-                    IQueryable<config> _config_details = (from _conf in _scrme.configs
-                                                          select _conf);
-
-                    // declare new class object as List
-                    List<ConfigDetails> _list_config_details = new List<ConfigDetails>();
-
-                    // for existing config
-                    if (_config_details.Count() > 0)
-                    {
-                        // iterate through the rows from that field category
-                        foreach (config _config_item in _config_details)
-                        {
-                            // declare ConfigDetails class object
-                            // ConfigDetails _cd = new ConfigDetails(); // old
-
-                            // assign the id, name and details to the ConfigDetails object
-                            //  _cd.P_Id = _config_item.P_Id; // old
-                            //  _cd.P_Name = _config_item.P_Name; // old
-                            //  _cd.P_Value = _config_item.P_Value; // old
-
-                            // create ConfigDetails object using the constructor
-                            ConfigDetails _cd = new ConfigDetails(_config_item.P_Id, _config_item.P_Name, _config_item.P_Value);
-
-
-                            // apend the object to the list
-                            _list_config_details.Add(_cd);
-                        }
-
-                        // for non-existing field category
-                    }
-                    else
-                    {
-                     //   _list_config_details = null; //old
-                    }
-
-                    JArray configJson = (JArray)JToken.FromObject(_list_config_details);
-
-                    // add config to _agentObj
-                    agentObj.Add(new JProperty("config", configJson));
-
-
-                    allJsonResults = new JObject()
-                    {
-                        new JProperty("result", AppOutp.OutputResult_SUCC),
-                        new JProperty("details", agentObj)
-                    };
-
+                    return CreateErrorResponse(tempAgent.Counter >= 3 ? "Account is locked." : "Invalid login.", tempAgent.AgentID);
                 }
-                else
-                {
-                    // set the alert messages and login status to false
-                    if (_agent.Account_status != "Active")
-                    {
-                        details = "Account is inactive.";
-                    }
-                    else if (_agent.LastLoginDate == null)
-                    {
-                        details = "Initial Login.";
-                    }
-                    else if (_agent.ExpiryDate <= DateTime.Today)
-                    {
-                        details = "Account has expired.";
-                    }
-                    else if (_agent.Counter == 3)
-                    {
-                        details = "Account is locked.";
-                    }
-
-                    //      _agent.Counter = 0; // reset counter
-
-                    canLogin = false;
-                    existing_agentid = _agent.AgentID;
-                }
-            }
-            else
-            // either the id or password is incorrect
-            {
-
-                canLogin = false; // cannot login
-
-                // wrong password
-                if (_agent_temp != null)
-                {
-                    // only add counter when it's < 3
-                    if (_agent_temp.Counter < 3)
-                    {
-                        // iterate the counter
-                        _agent_temp.Counter = _agent_temp.Counter + 1;
-                    }
-                    else
-                    {
-                        details = "Account is locked.";
-                    }
-
-                    // update status and save changes in db
-                    _scrme.SaveChanges();
-                }
+                return CreateErrorResponse("Invalid login.", 0);
             }
 
-            if (!canLogin)
+            if (agent.Account_status != "Active")
             {
-                if (details == "Initial Login.")
-                {
-                    allJsonResults = new JObject()
-                    {
-                        new JProperty("result", AppOutp.OutputResult_FAIL),
-                        new JProperty("details", details),
-                        new JProperty("AgentID", existing_agentid),
-                        new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
-                    };
-                }
-                else if (details == "Account has expired.")
-                {
-                    allJsonResults = new JObject()
-                    {
-                        new JProperty("result", AppOutp.OutputResult_FAIL),
-                        new JProperty("details", details),
-                        new JProperty("AgentID", existing_agentid),
-                        new JProperty(AppInp.InputAuth_Token, ValidateClass.GenerateToken(Convert.ToString(existing_agentid)))
-                    };
-                }
-                else
-                {
-
-                    details = (details == "") ? "Invalid login." : details;
-
-                    allJsonResults = new JObject()
-                    {
-                        new JProperty("result", AppOutp.OutputResult_FAIL),
-                        new JProperty("details", details)
-                    };
-                }
+                return CreateErrorResponse("Account is inactive.", agent.AgentID);
+            }
+            if (agent.LastLoginDate == null)
+            {
+                return CreateErrorResponse("Initial Login.", agent.AgentID);
+            }
+            if (agent.ExpiryDate <= DateTime.Today)
+            {
+                return CreateErrorResponse("Account has expired.", agent.AgentID);
+            }
+            if (agent.Counter >= 3)
+            {
+                return CreateErrorResponse("Account is locked.", agent.AgentID);
             }
 
+            agent.Counter = 0;
+            agent.LastLoginDate = DateTime.Now;
+            _scrme.SaveChanges();
 
-            // return all results in json format
-            return allJsonResults;
+            var agentObj = BuildAgentJson(agent);
+            return new JObject
+            {
+                { "result", AppOutp.OutputResult_SUCC },
+                { "details", agentObj }
+            };
         }
 
+        private JObject BuildAgentJson(agentinfo agent)
+        {
+            var agentObj = new JObject();
+            foreach (PropertyInfo property in agent.GetType().GetProperties())
+            {
+                if (property.Name is "Password" or "Photo" or "Photo_Type")
+                    continue;
+                agentObj.Add(new JProperty(property.Name, property.GetValue(agent)));
+            }
+
+            var role = _scrme.user_roles
+                .Where(_r => _r.RoleID == agent.LevelID)
+                .Select(_r => new { _r.RoleName, _r.Companies, _r.Categories, _r.Functions })
+                .FirstOrDefault();
+
+            if (role != null)
+            {
+                agentObj.Add("RoleName", role.RoleName);
+                agentObj.Add("Companies", role.Companies);
+                agentObj.Add("Categories", role.Categories);
+                agentObj.Add("Functions", role.Functions);
+            }
+
+            agentObj.Add(AppInp.InputAuth_Token, ValidateClass.GenerateToken(agent.AgentID.ToString()));
+
+            var configDetails = _scrme.configs
+                .Select(_conf => new ConfigDetails(_conf.P_Id, _conf.P_Name, _conf.P_Value))
+                .ToList();
+            agentObj.Add("config", JArray.FromObject(configDetails));
+
+            return agentObj;
+        }
+
+        private JObject CreateErrorResponse(string details, int agentId)
+        {
+            _scrme.SaveChanges();
+
+            if (details is "Initial Login." or "Account has expired.")
+            {
+                return new JObject
+                {
+                    { "result", AppOutp.OutputResult_FAIL },
+                    { "details", details },
+                    { "AgentID", agentId },
+                    { AppInp.InputAuth_Token, ValidateClass.GenerateToken(agentId.ToString()) }
+                };
+            }
+
+            return new JObject
+            {
+                { "result", AppOutp.OutputResult_FAIL },
+                { "details", details }
+            };
+        }
 
 
         // Create User
