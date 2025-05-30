@@ -155,8 +155,8 @@ namespace marvel_main_NET8.Controllers
             // include the list in the JSON object of the final result
             JObject jsonResults = new JObject()
             {
-                new JProperty("result", AppOutp.OutputResult_SUCC),
-                new JProperty("details", detailsJson)
+                new JProperty(AppOutp.OutputResult_Field, AppOutp.OutputResult_SUCC),
+                new JProperty(AppOutp.OutputDetails_Field, detailsJson)
             };
 
             // return all results in json format

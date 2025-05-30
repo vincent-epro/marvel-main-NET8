@@ -12,6 +12,9 @@ namespace marvel_main_NET8
 
     public static class AppOutp
     {
+        public const string OutputResult_Field = "result";
+        public const string OutputDetails_Field = "details";
+
         public const string OutputResult_SUCC = "success";
         public const string OutputResult_FAIL = "fail";
 

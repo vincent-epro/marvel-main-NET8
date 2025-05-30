@@ -131,8 +131,8 @@ namespace marvel_main_NET8.Controllers
             var agentObj = BuildAgentJson(agent);
             return new JObject
             {
-                { "result", AppOutp.OutputResult_SUCC },
-                { "details", agentObj }
+                { AppOutp.OutputResult_Field, AppOutp.OutputResult_SUCC },
+                { AppOutp.OutputDetails_Field, agentObj }
             };
         }
 
@@ -177,8 +177,8 @@ namespace marvel_main_NET8.Controllers
             {
                 return new JObject
                 {
-                    { "result", AppOutp.OutputResult_FAIL },
-                    { "details", details },
+                    { AppOutp.OutputResult_Field, AppOutp.OutputResult_FAIL },
+                    { AppOutp.OutputDetails_Field, details },
                     { "AgentID", agentId },
                     { AppInp.InputAuth_Token, ValidateClass.GenerateToken(agentId.ToString()) }
                 };
@@ -186,8 +186,8 @@ namespace marvel_main_NET8.Controllers
 
             return new JObject
             {
-                { "result", AppOutp.OutputResult_FAIL },
-                { "details", details }
+                { AppOutp.OutputResult_Field, AppOutp.OutputResult_FAIL },
+                { AppOutp.OutputDetails_Field, details }
             };
         }
 
@@ -571,8 +571,8 @@ namespace marvel_main_NET8.Controllers
 
             JObject rolesJson = new JObject() // add to overall json object
                     {
-                        new JProperty("result", AppOutp.OutputResult_SUCC),
-                        new JProperty("details", roleListJason)
+                        new JProperty(AppOutp.OutputResult_Field, AppOutp.OutputResult_SUCC),
+                        new JProperty(AppOutp.OutputDetails_Field, roleListJason)
                     };
 
             return rolesJson;
@@ -854,8 +854,8 @@ namespace marvel_main_NET8.Controllers
             // set up _all_results json data
             JObject allJsonResults = new JObject()
             {
-                new JProperty("result", AppOutp.OutputResult_SUCC),
-                new JProperty("details", _agent_list)
+                new JProperty(AppOutp.OutputResult_Field, AppOutp.OutputResult_SUCC),
+                new JProperty(AppOutp.OutputDetails_Field, _agent_list)
             };
 
             // return all results in json format
@@ -1064,8 +1064,8 @@ namespace marvel_main_NET8.Controllers
                 // add the log list to jobject
                 allJsonResults = new JObject()
                 {
-                     new JProperty("result", AppOutp.OutputResult_SUCC),
-                     new JProperty("details", jsonList)
+                     new JProperty(AppOutp.OutputResult_Field, AppOutp.OutputResult_SUCC),
+                     new JProperty(AppOutp.OutputDetails_Field, jsonList)
                 };
 
             }
@@ -1073,8 +1073,8 @@ namespace marvel_main_NET8.Controllers
             {
                 allJsonResults = new JObject()
                 {
-                     new JProperty("result", AppOutp.OutputResult_SUCC),
-                     new JProperty("details", jsonList)
+                     new JProperty(AppOutp.OutputResult_Field, AppOutp.OutputResult_SUCC),
+                     new JProperty(AppOutp.OutputDetails_Field, jsonList)
                 };
             }
 
