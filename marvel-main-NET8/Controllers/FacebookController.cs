@@ -198,7 +198,7 @@ namespace marvel_main_NET8.Controllers
             facebook_post _post_item = new facebook_post();
 
             int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
-            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
             string details = (data["Details"] ?? "").ToString();
 
             // assign new record
@@ -256,7 +256,7 @@ namespace marvel_main_NET8.Controllers
         {
             int fbId = Convert.ToInt32((data["Fb_Id"] ?? "-1").ToString());
             int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
-            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
 
             string details = (data["Details"] ?? "").ToString();
             string mediaRemoved = (data["Media_Removed"] ?? "N").ToString();
@@ -343,7 +343,7 @@ namespace marvel_main_NET8.Controllers
                     {
                         ticketId = Convert.ToInt32(Request.Form[key]);
                     }
-                    else if (key == "Agent_Id")
+                    else if (key == AppInp.InputAuth_Agent_Id)
                     {
                         agentId = Convert.ToInt32(Request.Form[key]);
 

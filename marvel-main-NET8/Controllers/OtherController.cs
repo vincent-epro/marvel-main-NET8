@@ -737,7 +737,7 @@ namespace marvel_main_NET8.Controllers
                 string fieldName = item.Key;
                 string fieldValue = item.Value?.ToString() ?? string.Empty;
 
-                if (fieldName != "RoleID" && fieldName != "Agent_Id" && fieldName != "Token")
+                if (fieldName != "RoleID" && fieldName != AppInp.InputAuth_Agent_Id && fieldName != "Token")
                 {
                     fieldsToBeUpdatedDict.Add(fieldName, fieldValue); // add non-RoleID fields to the Dictionary
                 }
@@ -1110,7 +1110,7 @@ namespace marvel_main_NET8.Controllers
 
         private void AddCRM_FloorPlan(JsonObject data)
         {
-            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
 
             floor_plan _new_fp_item = new floor_plan();
 
@@ -1163,7 +1163,7 @@ namespace marvel_main_NET8.Controllers
         private void UpdateCRM_FloorPlan([FromBody] dynamic data)
         {
             int fID = Convert.ToInt32((data["F_Id"] ?? "-1").ToString());
-            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
 
             var _ss = (from _c in _scrme.floor_plans
                        where _c.F_Id == fID
@@ -1214,7 +1214,7 @@ namespace marvel_main_NET8.Controllers
                     {
                         agentId = Convert.ToInt32(Request.Form[key]);
                     }
-                    else if (key == "Agent_Id")
+                    else if (key == AppInp.InputAuth_Agent_Id)
                     {
                         tk_agentId = Convert.ToString(Request.Form[key]);
                     }
@@ -1464,7 +1464,7 @@ namespace marvel_main_NET8.Controllers
 
         private void AddCRM_ScheduleSetting(JsonObject data)
         {
-            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
 
             task_schedule_setting _new_sch_item = new task_schedule_setting();
 
@@ -1515,7 +1515,7 @@ namespace marvel_main_NET8.Controllers
         private void UpdateCRM_ScheduleSetting(JsonObject data)
         {
             int sID = Convert.ToInt32((data["S_Id"] ?? "-1").ToString());
-            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
             string s_action = (data["S_Action"] ?? "").ToString();
 
 
@@ -1630,7 +1630,7 @@ namespace marvel_main_NET8.Controllers
         private void HandleCRM_ScheduleAlert(JsonObject data)
         {
             int rID = Convert.ToInt32((data["R_Id"] ?? "-1").ToString());
-            int agentId = Convert.ToInt32((data["Agent_Id"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
 
 
             var _sr = (from _c in _scrme.task_schedule_records
