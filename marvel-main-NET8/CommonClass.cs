@@ -8,6 +8,11 @@ namespace marvel_main_NET8
     {
         public const string InputAuth_Agent_Id = "Agent_Id";
         public const string InputAuth_Token = "Token";
+
+        public const string Input_Ticket_Id = "Ticket_Id";
+        public const string Input_SellerID = "SellerID";
+        public const string Input_Password = "Password";
+
     }
 
     public static class AppOutp

@@ -54,7 +54,7 @@ namespace marvel_main_NET8.Controllers
 
         private bool TicketId_Exists(JsonObject data)
         {
-            int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
+            int ticketId = Convert.ToInt32((data[AppInp.Input_Ticket_Id] ?? "-1").ToString());
 
             bool exists = true;
 
@@ -86,7 +86,7 @@ namespace marvel_main_NET8.Controllers
                 if (ValidateClass.Authenticated(token, tk_agentId))
                 {
 
-                    int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
+                    int ticketId = Convert.ToInt32((data[AppInp.Input_Ticket_Id] ?? "-1").ToString());
 
 
                     return Content(GetCRM_FacebookPostContent(ticketId).ToString(), AppOutp.Output_Json_Charset, Encoding.UTF8);
@@ -132,7 +132,7 @@ namespace marvel_main_NET8.Controllers
                         switch (property.Name)
                         {
                             case "Fb_Id":
-                            case "Ticket_Id":
+                            case AppInp.Input_Ticket_Id:
                             case "Details":
                             case "Media_Type":
                             case "Media_Link":
@@ -197,7 +197,7 @@ namespace marvel_main_NET8.Controllers
             // declare db table items
             facebook_post _post_item = new facebook_post();
 
-            int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
+            int ticketId = Convert.ToInt32((data[AppInp.Input_Ticket_Id] ?? "-1").ToString());
             int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
             string details = (data["Details"] ?? "").ToString();
 
@@ -255,7 +255,7 @@ namespace marvel_main_NET8.Controllers
         private void UpdateCRM_FacebookPostContent(JsonObject data)
         {
             int fbId = Convert.ToInt32((data["Fb_Id"] ?? "-1").ToString());
-            int ticketId = Convert.ToInt32((data["Ticket_Id"] ?? "-1").ToString());
+            int ticketId = Convert.ToInt32((data[AppInp.Input_Ticket_Id] ?? "-1").ToString());
             int agentId = Convert.ToInt32((data[AppInp.InputAuth_Agent_Id] ?? "-1").ToString());
 
             string details = (data["Details"] ?? "").ToString();
@@ -339,7 +339,7 @@ namespace marvel_main_NET8.Controllers
 
                 foreach (var key in Request.Form.Keys)
                 {
-                    if (key == "Ticket_Id")
+                    if (key == AppInp.Input_Ticket_Id)
                     {
                         ticketId = Convert.ToInt32(Request.Form[key]);
                     }

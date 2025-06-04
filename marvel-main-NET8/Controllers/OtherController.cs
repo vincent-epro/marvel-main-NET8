@@ -82,8 +82,8 @@ namespace marvel_main_NET8.Controllers
 
         private JObject Logincrm(JsonObject data)
         {
-            string sellerId = (data["SellerID"] ?? "").ToString();
-            string password = (data["Password"] ?? "").ToString();
+            string sellerId = (data[AppInp.Input_SellerID] ?? "").ToString();
+            string password = (data[AppInp.Input_Password] ?? "").ToString();
 
             if (string.IsNullOrEmpty(sellerId))
             {
@@ -141,7 +141,7 @@ namespace marvel_main_NET8.Controllers
             var agentObj = new JObject();
             foreach (PropertyInfo property in agent.GetType().GetProperties())
             {
-                if (property.Name is "Password" or "Photo" or "Photo_Type")
+                if (property.Name is AppInp.Input_Password or "Photo" or "Photo_Type")
                     continue;
                 agentObj.Add(new JProperty(property.Name, property.GetValue(agent)));
             }
@@ -226,10 +226,10 @@ namespace marvel_main_NET8.Controllers
 
             // obtain form body values
             int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
-            string sellerID = (data["SellerID"] ?? "").ToString();
+            string sellerID = (data[AppInp.Input_SellerID] ?? "").ToString();
             string agentName = (data["AgentName"] ?? "").ToString();
             string email = (data["Email"] ?? "").ToString();
-            string password = (data["Password"] ?? "").ToString();
+            string password = (data[AppInp.Input_Password] ?? "").ToString();
 
             string role = (data["Role"] ?? "").ToString();
             int levelId = GetLevelId(role); // get level Id using the role name
@@ -338,10 +338,10 @@ namespace marvel_main_NET8.Controllers
             int colId = Convert.ToInt32((data["ColId"] ?? "-1").ToString());
 
             int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
-            string sellerID = (data["SellerID"] ?? "").ToString();
+            string sellerID = (data[AppInp.Input_SellerID] ?? "").ToString();
             string agentName = (data["AgentName"] ?? "").ToString();
             string email = (data["Email"] ?? "").ToString();
-            string password = (data["Password"] ?? "").ToString();
+            string password = (data[AppInp.Input_Password] ?? "").ToString();
 
             string role = (data["Role"] ?? "").ToString();
             int levelId = GetLevelId(role); // get level Id using the role name
@@ -496,7 +496,7 @@ namespace marvel_main_NET8.Controllers
         private bool SellerIdExists(JsonObject data)
         {
 
-            string sellerId = (data["SellerID"] ?? "").ToString();
+            string sellerId = (data[AppInp.Input_SellerID] ?? "").ToString();
             bool exists = true;
 
             agentinfo? _agent = (from _a in _scrme.agentinfos
@@ -832,7 +832,7 @@ namespace marvel_main_NET8.Controllers
                     switch (property.Name)
                     {
 
-                        case "Password":
+                        case AppInp.Input_Password:
                             {
                                 break;
                             }
@@ -891,9 +891,9 @@ namespace marvel_main_NET8.Controllers
 
         private string ChangeUserPassword(JsonObject data)
         {
-            string sellerId = (data["SellerID"] ?? "").ToString();
+            string sellerId = (data[AppInp.Input_SellerID] ?? "").ToString();
             string oldPassword = (data["Old_Password"] ?? "").ToString();
-            string password = (data["Password"] ?? "").ToString();
+            string password = (data[AppInp.Input_Password] ?? "").ToString();
 
             // obtain single user record based on the agent id
             agentinfo? _agent = (from _a in _scrme.agentinfos
