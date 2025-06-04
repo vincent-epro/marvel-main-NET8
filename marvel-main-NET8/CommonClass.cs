@@ -13,6 +13,8 @@ namespace marvel_main_NET8
         public const string Input_SellerID = "SellerID";
         public const string Input_Password = "Password";
 
+        public const string Input_AgentID = "AgentID";
+
     }
 
     public static class AppOutp
@@ -26,6 +28,8 @@ namespace marvel_main_NET8
         public const string Not_Auth_Desc = "Not Auth.";
 
         public const string Output_Json_Charset = "application/json; charset=utf-8";
+
+        public const string STATUS_Active = "Active";
 
     }
 

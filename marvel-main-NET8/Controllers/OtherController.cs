@@ -107,7 +107,7 @@ namespace marvel_main_NET8.Controllers
                 return CreateErrorResponse("Invalid login.", 0);
             }
 
-            if (agent.Account_status != "Active")
+            if (agent.Account_status != AppOutp.STATUS_Active)
             {
                 return CreateErrorResponse("Account is inactive.", agent.AgentID);
             }
@@ -179,7 +179,7 @@ namespace marvel_main_NET8.Controllers
                 {
                     { AppOutp.OutputResult_Field, AppOutp.OutputResult_FAIL },
                     { AppOutp.OutputDetails_Field, details },
-                    { "AgentID", agentId },
+                    { AppInp.Input_AgentID, agentId },
                     { AppInp.InputAuth_Token, ValidateClass.GenerateToken(agentId.ToString()) }
                 };
             }
@@ -225,7 +225,7 @@ namespace marvel_main_NET8.Controllers
             agentinfo _agent_item = new agentinfo();
 
             // obtain form body values
-            int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.Input_AgentID] ?? "-1").ToString());
             string sellerID = (data[AppInp.Input_SellerID] ?? "").ToString();
             string agentName = (data["AgentName"] ?? "").ToString();
             string email = (data["Email"] ?? "").ToString();
@@ -337,7 +337,7 @@ namespace marvel_main_NET8.Controllers
             // obtain form body values
             int colId = Convert.ToInt32((data["ColId"] ?? "-1").ToString());
 
-            int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.Input_AgentID] ?? "-1").ToString());
             string sellerID = (data[AppInp.Input_SellerID] ?? "").ToString();
             string agentName = (data["AgentName"] ?? "").ToString();
             string email = (data["Email"] ?? "").ToString();
@@ -451,7 +451,7 @@ namespace marvel_main_NET8.Controllers
         private bool UserExists(JsonObject data)
         {
 
-            int agentId = Convert.ToInt32((data["AgentID"] ?? "-1").ToString());
+            int agentId = Convert.ToInt32((data[AppInp.Input_AgentID] ?? "-1").ToString());
             bool exists = true;
 
             agentinfo? _agent = (from _a in _scrme.agentinfos
@@ -549,7 +549,7 @@ namespace marvel_main_NET8.Controllers
             IQueryable<user_role> _linq_user_roles = from _r in _scrme.user_roles
                                                      select _r; // declare user role data
 
-            if (status == "Active")
+            if (status == AppOutp.STATUS_Active)
             {
                 _linq_user_roles = _linq_user_roles.Where(_r => _r.RoleStatus == "A");
             }
@@ -803,8 +803,7 @@ namespace marvel_main_NET8.Controllers
                                     on _agent.LevelID equals _role.RoleID
                                     into joined
                                from _roles in joined.DefaultIfEmpty()
-                               orderby _agent.SellerID
-                               //where _agent.Account_status == "Active"
+                               orderby _agent.SellerID                               
                                select new
                                {
                                    _agent,
@@ -1120,7 +1119,7 @@ namespace marvel_main_NET8.Controllers
             _new_fp_item.Background = (data["Background"] ?? "").ToString();
             _new_fp_item.Style = (data["Style"] ?? "").ToString();
             _new_fp_item.Remarks = (data["Remarks"] ?? "").ToString();
-            _new_fp_item.Status = "Active";
+            _new_fp_item.Status = AppOutp.STATUS_Active;
 
             _new_fp_item.Created_By = agentId;
             _new_fp_item.Created_Time = DateTime.Now;
@@ -1429,7 +1428,7 @@ namespace marvel_main_NET8.Controllers
         {
             // obtain results
             IQueryable<task_schedule_setting> _sch = from _r in _scrme.task_schedule_settings
-                                                               where _r.Status == "Active"
+                                                               where _r.Status == AppOutp.STATUS_Active
                                                                select _r;
 
             return _sch.ToList();
@@ -1472,7 +1471,7 @@ namespace marvel_main_NET8.Controllers
             _new_sch_item.Display_Message = (data["Display_Message"] ?? "").ToString();
             _new_sch_item.Schedule_Type = (data["Schedule_Type"] ?? "").ToString();
             _new_sch_item.Schedule_Time = Convert.ToDateTime((data["Schedule_Time"] ?? "").ToString());
-            _new_sch_item.Status = "Active";
+            _new_sch_item.Status = AppOutp.STATUS_Active;
 
             _new_sch_item.Created_By = agentId;
             _new_sch_item.Created_Time = DateTime.Now;
@@ -1520,7 +1519,7 @@ namespace marvel_main_NET8.Controllers
 
 
             var _ss = (from _c in _scrme.task_schedule_settings
-                       where _c.S_Id == sID && _c.Status == "Active"
+                       where _c.S_Id == sID && _c.Status == AppOutp.STATUS_Active
                        select _c).SingleOrDefault<task_schedule_setting>();
 
             // exists in table
